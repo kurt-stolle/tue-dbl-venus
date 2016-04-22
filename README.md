@@ -1,2 +1,2 @@
-# tue-ee-venus
+# TU/e EE Venus
 Project related files
