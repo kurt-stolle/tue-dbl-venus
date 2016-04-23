@@ -12,4 +12,4 @@ Please refer to the [documentation] (/docs) folder of this project.
 - TU\e project website: http://www.es.ele.tue.nl/education/oo2/
 
 ## License
-Refer to the "LICENSE" file in the root of this project.
+Please refer to the [license file] (/LICENSE) in the root of this project.
