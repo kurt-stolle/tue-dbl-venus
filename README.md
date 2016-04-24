@@ -1,5 +1,15 @@
 # TU/e EE Venus
-Project related files
+Project related files for the Venus Exploration OGO of the TU Eindhoven.
 
-# Styleguide code
-https://www.arduino.cc/en/Reference/APIStyleGuide
+## Authors
+Kurt Stolle, Loek Steinebach, Tim Stek, Niels Timmerman, Marius Stole.
+
+## Documentation
+Please refer to the [documentation] (/docs) folder of this project.
+
+## Useful resources
+- Arduino styleguide: https://www.arduino.cc/en/Reference/APIStyleGuide
+- TU\e project website: http://www.es.ele.tue.nl/education/oo2/
+
+## License
+Please refer to the [license file] (/LICENSE) in the root of this project.
