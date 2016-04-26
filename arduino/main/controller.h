@@ -13,7 +13,7 @@
 // Typedefs used in the controller
 typedef unsigned char pin;
 
-// Enumerations
+// Enumerations for state
 enum action {
   NONE = 0,
   MOVING_FORWARD = 1,
