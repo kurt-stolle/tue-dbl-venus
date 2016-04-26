@@ -11,7 +11,8 @@ Controller* ctrl;
 void setup() {
   // Allocate a layout that we may fill out here
   ControllerLayout* layout = new ControllerLayout();
-  
+
+  // Configure pins
   layout->wheelLeft = 0;
   layout->wheelRight = 0;
 
