@@ -4,15 +4,18 @@
  *  Arduino Logic
  */
 
-#include "Controller.h"
+#include "RobotController.h"
 
-Controller* ctrl;
+RobotController* robotController;
 
 void setup() {
-  // Construct the controller
-  ctrl = new Controller();
+  // Initialize robotController
+  robotController = new RobotController();
+
+  // Start moving
+  robotController->Accelerate();
 }
 
 void loop() {
-  ctrl->Turn(-1);
+  
 }

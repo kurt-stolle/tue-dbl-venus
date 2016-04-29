@@ -4,14 +4,10 @@
  *  Header
  */
 
-#ifndef Controller_h
-#define Controller_h
+#ifndef RobotController_h
+#define RobotController_h
 
-// Arduino.h includes arduino functions we may want to use.
-#include "Arduino.h"
-
-// Typedefs used in the controller
-typedef unsigned char pin;
+#include <Servo.h>
 
 // Enumerations for state
 enum action {
@@ -25,9 +21,10 @@ enum action {
 };
 
 // Controller is a class that handles electronics of our venus robot
-class Controller {
+class RobotController {
   public:
-    Controller(ControllerLayout* l);
+    RobotController();
+    void Accelerate();
     void Turn(double ang);          // Turning (left is negative, right positive)
     void Grab();                    // Grabbing
     void Scan();                    // Perform one sweep
@@ -36,7 +33,8 @@ class Controller {
     void addAction(action a);       // Set a state flag
     void removeAction(action a);    // Unset a state flag
     int state;                      // The current state of the robot, collection of actions defined above
-    ControllerLayout* layout;       // The configuration of the robot
+    Servo wheelLeft;
+    Servo wheelRight;
 };
 
 #endif

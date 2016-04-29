@@ -12,4 +12,6 @@
 #define PIN_SERVO_ULTRASOUND 0
 #define PIN_SENSOR_ULTRASOUND 0
 
+typedef unsigned char pin;
+
 #endif

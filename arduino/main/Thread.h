@@ -1,15 +1,8 @@
 /*
- 	Thread.h - An runnable object
-
-	Thread is responsable for holding the "action" for something,
-	also, it responds if it "should" or "should not" run, based on
-	the current time;
-
-	For instructions, go to https://github.com/ivanseidel/ArduinoThread
-
-	Created by Ivan Seidel Gomes, March, 2013.
-	Released into the public domain.
-*/
+ *  TU/e Venus OGO
+ *  Thread 
+ *  Header
+ */
 
 #ifndef Thread_h
 #define Thread_h
@@ -22,14 +15,6 @@
 
 #include <inttypes.h>
 
-/*
-	Uncomment this line to enable ThreadName Strings.
-
-	It might be usefull if you are loging thread with Serial,
-	or displaying a list of threads...
-*/
-// #define USE_THREAD_NAMES	1
-
 class Thread{
 protected:
 	// Desired interval between runs
@@ -41,12 +26,6 @@ protected:
 	// Scheduled run in Ms (MUST BE CACHED)	
 	unsigned long _cached_next_run;
 
-	/*
-		IMPORTANT! Run after all calls to run()
-		Updates last_run and cache next run.
-		NOTE: This MUST be called if extending
-		this class and implementing run() method
-	*/
 	void runned(unsigned long time);
 
 	// Default is to mark it runned "now"

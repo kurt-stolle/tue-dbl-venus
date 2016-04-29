@@ -1,17 +1,9 @@
 /*
- 	ThreadController.h - Controlls a list of Threads with different timings
+ *  TU/e Venus OGO
+ *  ThreadController 
+ *  Header
+ */
 
-	Basicaly, what it does is to keep track of current Threads and run when
-	necessary.
-
-	ThreadController is an extended class of Thread, because of that,
-	it allows you to add a ThreadController inside another ThreadController...
-
-	For instructions, go to https://github.com/ivanseidel/ArduinoThread
-
-	Created by Ivan Seidel Gomes, March, 2013.
-	Released into the public domain.
-*/
 
 #ifndef ThreadController_h
 #define ThreadController_h

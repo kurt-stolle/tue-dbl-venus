@@ -14,9 +14,6 @@ ThreadController::ThreadController(unsigned long _interval): Thread(){
 	#endif
 }
 
-/*
-	ThreadController run() (cool stuf)
-*/
 void ThreadController::run(){
 	// Run this thread before
 	if(_onRun != NULL)
@@ -38,10 +35,6 @@ void ThreadController::run(){
 	runned();
 }
 
-
-/*
-	List controller (boring part)
-*/
 bool ThreadController::add(Thread* _thread){
 	// Check if the Thread already exists on the array
 	for(int i = 0; i < MAX_THREADS; i++){
