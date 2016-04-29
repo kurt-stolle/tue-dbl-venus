@@ -4,13 +4,13 @@
  *  Implementation
  */
 
-#include "controller.h"
+#include "Controller.h"
 
 /*
  * Constructor
  */
-Controller::Controller(ControllerLayout* l){
-  this->layout = l;
+Controller::Controller(){
+  // Nothing so far
 }
 
 /*

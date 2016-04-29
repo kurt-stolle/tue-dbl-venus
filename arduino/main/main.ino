@@ -4,20 +4,13 @@
  *  Arduino Logic
  */
 
-#include "controller.h"
+#include "Controller.h"
 
 Controller* ctrl;
 
 void setup() {
-  // Allocate a layout that we may fill out here
-  ControllerLayout* layout = new ControllerLayout();
-
-  // Configure pins
-  layout->wheelLeft = 0;
-  layout->wheelRight = 0;
-
   // Construct the controller
-  ctrl = new Controller(layout);
+  ctrl = new Controller();
 }
 
 void loop() {

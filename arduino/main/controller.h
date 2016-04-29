@@ -24,13 +24,6 @@ enum action {
   SCANNING = 32
 };
 
-// ControllerLayout is a structure that tells us something about the configuration of the robot
-struct ControllerLayout {
-  pin wheelLeft;
-  pin wheelRight;
-  // etc...
-};
-
 // Controller is a class that handles electronics of our venus robot
 class Controller {
   public:
