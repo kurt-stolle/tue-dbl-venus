@@ -1,0 +1,6 @@
+right wheel motor: pin 12
+left wheel motor: pin 13
+oogjes servo: pin 11
+grijper servo: pin 10
+
+StartResetIndicator (speaker): pin 4
