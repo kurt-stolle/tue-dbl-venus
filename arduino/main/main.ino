@@ -1,6 +1,6 @@
 /*
  *  TU/e Venus OGO
- *  Main 
+ *  Main
  *  Arduino Logic
  */
 
@@ -9,16 +9,16 @@
 RobotController* robotController;
 
 void setup() {
-  // Initialize robotController
-  robotController = new RobotController();
+	// Debug
+	Serial.begin(9600);
 
-  Serial.begin(9600);
+	// Initialize robotController
+	robotController = new RobotController();
 
-  // Start moving
-  robotController->Accelerate();
-
+	// Start moving
+	robotController->Accelerate(Speed::FULL);
 }
 
 void loop() {
-  
+
 }

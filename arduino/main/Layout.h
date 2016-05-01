@@ -1,6 +1,6 @@
 /*
  *  TU/e Venus OGO
- *  Controller 
+ *  Controller
  *  Header for layout, to save memory
  */
 

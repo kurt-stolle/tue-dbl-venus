@@ -6,64 +6,72 @@
 /*
  * Constructor
  */
-RobotController::RobotController(){
-  
+RobotController::RobotController() {
+	this->wheelRight.attach(PIN_MOTOR_RIGHT);
+	this->wheelLeft.attach(PIN_MOTOR_LEFT);
 }
+
 /*
  * Public methods
  */
-void RobotController::Accelerate() {
-  int mot1 = 1500;
-  int mot2 = 1495;
+void RobotController::Accelerate(int speed) {
+	// Stop
+	if (speed == Speed::NONE) {
+		this->removeAction(Action::MOVING_BACKWARD);
+		this->removeAction(Action::MOVING_FORWARD);
+	}
+	// Forward
+	else if (speed > Speed::NONE) {
+		this->removeAction(Action::MOVING_BACKWARD);
+		this->addAction(Action::MOVING_FORWARD);
+	}
+	// Backward
+	else {
+		this->removeAction(Action::MOVING_FORWARD);
+		this->addAction(Action::MOVING_BACKWARD);
+	}
 
-  
-  this->wheelRight.attach(PIN_MOTOR_RIGHT);
-  this->wheelLeft.attach(PIN_MOTOR_LEFT);
-
-  this->wheelRight.writeMicroseconds(mot1);
-  this->wheelLeft.writeMicroseconds(mot2);
-
-  /*for(int i = 0; i < 20; i++) {
-    this->wheelRight.writeMicroseconds(mot1);
-    this->wheelLeft.writeMicroseconds(mot2);
-
-    Serial.print("mot1: ");
-    Serial.println(mot1);
-    Serial.print("mot2: ");
-    Serial.println(mot2);
-    
-    mot1 += 5;
-    mot2 -= 5;
-
-    delay(200);
-  }*/
-  
-}
- 
-void RobotController::Turn(double deg){
-  
+	this->wheelLeft.write(90 - speed);
+	this->wheelRight.write(90 + speed);
 }
 
-void RobotController::Grab(){
-  
+void RobotController::Reverse(int speed) {
+	this->Accelerate(-speed);
 }
 
-void RobotController::Scan(){
-  
+void RobotController::Turn(double deg) {
+	if (deg > 0.0)
+		this->addAction(Action::TURNING_RIGHT);
+	else
+		this->addAction(Action::TURNING_LEFT);
+
+	this->wheelLeft.write(90 - Speed::HALF);
+	this->wheelRight.write(90 + Speed::HALF);
+	delay(500); // Approximate value. To be determined..
+
+	this->Accelerate(Speed::NONE);
 }
 
-bool RobotController::IsPerforming(action a) {
-  return (this->state & a);
+void RobotController::Grab() {
+
+}
+
+void RobotController::Scan() {
+
+}
+
+bool RobotController::IsPerforming(Action a) {
+	return (this->state & a);
 }
 
 /*
  * Private methods
  */
-void RobotController::addAction(action a){
-  this->state = this->state | a;
+void RobotController::addAction(Action a) {
+	this->state = this->state | a;
 }
 
-void RobotController::removeAction(action a){
-  this->state = this->state ^ a;
+void RobotController::removeAction(Action a) {
+	this->state = this->state ^ a;
 }
 
