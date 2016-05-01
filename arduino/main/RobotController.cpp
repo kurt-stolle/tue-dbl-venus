@@ -9,6 +9,7 @@
 RobotController::RobotController() {
 	this->wheelRight.attach(PIN_MOTOR_RIGHT);
 	this->wheelLeft.attach(PIN_MOTOR_LEFT);
+	this->usSensorServo.attach(PIN_SERVO_ULTRASOUND);
 }
 
 /*

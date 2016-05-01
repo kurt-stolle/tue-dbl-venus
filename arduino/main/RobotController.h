@@ -44,6 +44,7 @@ private:
 	int state;                      // The current state of the robot, collection of actions defined above
 	Servo wheelLeft;
 	Servo wheelRight;
+	Servo usSensorServo;
 };
 
 #endif
