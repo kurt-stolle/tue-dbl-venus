@@ -1,0 +1,41 @@
+1.
+	A: Done. Testing after the meeting.
+	B: Forgot switch for the motor power. It is now fine, robot could move.
+	Ultrasonic sensor is still to be tested.
+	C: Done. Did not hand in the report in time (because of confusion with time
+	notation), but it has been fixed.
+	D: Ordered, expecting them to arrive within a month.
+	
+	Extra points: We didn't get an answer to the questions we
+	had last week, but we figured it out anyway. Not a problem
+	anymore.
+2.
+	A: Planning to do this after the meeting.
+	B: Concurrency needed, trying to find a workaround for that since
+	an Arduino doesn't support multithreading. Focus will be on
+	utility functions and strategy for now. Algorithm will be developed
+	later.
+	C: After the meeting.
+	D: As we missed the deadline, our design report will not be peer reviewed.
+	As a solution we can ask friends to review our report anyway (3 friends per member).
+	
+	Extra points: No ghantt chart was made, we really should according to Dogus.
+3.
+	Kurt & Loek: utility functions.
+	Tim & Niels & Marius: write test sequences & fix hardware.
+	
+	A more specific division will be made after the meeting.
+4.
+	It was discussed that Office 365 (2016) might be more
+	convenient for the final report, since we will be able to work
+	simultaneously. Office is free for students, so obtaining a license 
+	will not be a problem.
+	
+	We don't really have an indication of the progress of other groups. Dogus
+	suggests to just stick our nose in the business of other groups and
+	see how they are doing ;).
+	
+	Dogus wants more participation from everyone, and does not want one
+	person to do everything at the same time. 
+	
+	
