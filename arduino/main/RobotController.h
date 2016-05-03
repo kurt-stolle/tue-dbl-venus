@@ -10,14 +10,16 @@
 #include <Servo.h>
 
  // Enumerations for state
-enum Action {
-	NONE = 0,
-	MOVING_FORWARD = 1,
-	MOVING_BACKWARD = 2,
-	TURNING_LEFT = 4,
-	TURNING_RIGHT = 8,
-	GRABBING = 16,
-	SCANNING = 32
+namespace Action {
+  enum Action {
+  	NONE = 0,
+  	MOVING_FORWARD = 1,
+  	MOVING_BACKWARD = 2,
+  	TURNING_LEFT = 4,
+  	TURNING_RIGHT = 8,
+  	GRABBING = 16,
+  	SCANNING = 32
+  };
 };
 
 // Enumerations for speed
@@ -33,15 +35,16 @@ namespace Speed {
 class RobotController {
 public:
 	RobotController();
-	void Accelerate(int speed);
+	void Forward(int speed);
+  void Reverse(int speed);
 	void Turn(double ang);          // Turning (left is negative, right positive)
 	void Grab();                    // Grabbing
-	void Scan();                    // Perform one sweep
-	bool IsPerforming(Action a);    // Check whether an action is being performed
+	void Scan();                            // Perform one sweep
+	bool IsPerforming(Action::Action a);    // Check whether an action is being performed
 private:
-	void addAction(Action a);       // Set a state flag
-	void removeAction(Action a);    // Unset a state flag
-	int state;                      // The current state of the robot, collection of actions defined above
+	void addAction(Action::Action a);       // Set a state flag
+	void removeAction(Action::Action a);    // Unset a state flag
+	int state;                              // The current state of the robot, collection of actions defined above
 	Servo wheelLeft;
 	Servo wheelRight;
 	Servo usSensorServo;

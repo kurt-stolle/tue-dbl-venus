@@ -1,3 +1,6 @@
+#include "Arduino.h"
+#include "Ultrasonic.h"
+
 /*
  * Constructor
  */

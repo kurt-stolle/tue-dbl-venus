@@ -16,7 +16,7 @@ void setup() {
 	robotController = new RobotController();
 
 	// Start moving
-	robotController->Accelerate(Speed::FULL);
+	robotController->Forward(Speed::FULL);
 }
 
 void loop() {

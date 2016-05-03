@@ -15,7 +15,7 @@ RobotController::RobotController() {
 /*
  * Public methods
  */
-void RobotController::Accelerate(int speed) {
+void RobotController::Forward(int speed) {
 	// Stop
 	if (speed == Speed::NONE) {
 		this->removeAction(Action::MOVING_BACKWARD);
@@ -37,7 +37,7 @@ void RobotController::Accelerate(int speed) {
 }
 
 void RobotController::Reverse(int speed) {
-	this->Accelerate(-speed);
+	this->Forward(-speed);
 }
 
 void RobotController::Turn(double deg) {
@@ -50,7 +50,7 @@ void RobotController::Turn(double deg) {
 	this->wheelRight.write(90 + Speed::HALF);
 	delay(500); // Approximate value. To be determined..
 
-	this->Accelerate(Speed::NONE);
+	this->Forward(Speed::NONE);
 }
 
 void RobotController::Grab() {
@@ -61,18 +61,18 @@ void RobotController::Scan() {
 
 }
 
-bool RobotController::IsPerforming(Action a) {
+bool RobotController::IsPerforming(Action::Action a) {
 	return (this->state & a);
 }
 
 /*
  * Private methods
  */
-void RobotController::addAction(Action a) {
+void RobotController::addAction(Action::Action a) {
 	this->state = this->state | a;
 }
 
-void RobotController::removeAction(Action a) {
+void RobotController::removeAction(Action::Action a) {
 	this->state = this->state ^ a;
 }
 

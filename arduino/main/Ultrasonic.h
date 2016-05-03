@@ -7,6 +7,8 @@
 #ifndef Ultrasonic_h
 #define Ultrasonic_h
 
+#include "Layout.h"
+
 class Ultrasonic {
 public:
 	Ultrasonic(pin trig);
