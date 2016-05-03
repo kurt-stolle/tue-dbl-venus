@@ -50,7 +50,7 @@ void RobotController::Turn(double deg) {
 	this->wheelLeft.write(90 + Speed::HALF);
 	this->wheelRight.write(90 - Speed::HALF);
 
-	this->Forward(Speed::NONE);
+	//this->Forward(Speed::NONE);
 }
 
 void RobotController::Grab() {

@@ -6,7 +6,7 @@
 class Tests {
 public:
  static void Run(RobotController* ctrl);
-}
+};
 
 #endif
 
