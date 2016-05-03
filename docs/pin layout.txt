@@ -1,6 +1,20 @@
-right wheel motor: pin 12
-left wheel motor: pin 13
-oogjes servo: pin 11
-grijper servo: pin 10
-
-StartResetIndicator (speaker): pin 4
+Digital 0 - RX ZigBee module
+Digital 1 - TX ZigBee module
+Digital 2 - not used
+Digital 3 (PWM) - not used
+Digital 4 - not used
+Digital 5 (PWM) - not used
+Digital 6 (PWM) - not used
+Digital 7 - left encoder
+Digital 8 - right encoder
+Digital 9 (PWM) - ultrasound sensor
+Digital 10 (PWM) - grabber servo
+Digital 11 (PWM) - ultrasound servo
+Digital 12 - left servo
+Digital 13 - right servo
+Analog 0 - not used
+Analog 1 - not used
+Analog 2 - not used
+Analog 3 - not used
+Analog 4 - not used
+Analog 5 - not used
