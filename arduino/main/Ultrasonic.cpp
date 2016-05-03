@@ -5,7 +5,8 @@
  * Constructor
  */
 Ultrasonic::Ultrasonic(pin trig) {
-	this->triggerPin = this->echoPin = trig;
+	this->triggerPin = trig;
+	this->echoPin = trig;
 }
 
 Ultrasonic::Ultrasonic(pin trig, pin echo) {
@@ -17,7 +18,7 @@ Ultrasonic::Ultrasonic(pin trig, pin echo) {
  * Public methods
  */
 
-double Ultrasonic::doMeasure() {
+double Ultrasonic::Measure() {
 	unsigned long duration;
 
 	/* 
@@ -27,8 +28,10 @@ double Ultrasonic::doMeasure() {
 
 	pinMode(this->triggerPin, OUTPUT);
 	digitalWrite(this->triggerPin, LOW);
+  
 	delayMicroseconds(2);
 	digitalWrite(this->triggerPin, HIGH);
+ 
 	delayMicroseconds(10);
 	digitalWrite(this->triggerPin, LOW);
 

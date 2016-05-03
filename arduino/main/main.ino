@@ -5,6 +5,8 @@
  */
 
 #include "RobotController.h"
+#include "Tests.h"
+#include "Layout.h"
 
 RobotController* robotController;
 
@@ -15,10 +17,13 @@ void setup() {
 	// Initialize robotController
 	robotController = new RobotController();
 
-	// Start moving
-	robotController->Forward(Speed::FULL);
+  // Setup the test button
+  pinMode(PIN_BTN_TEST, INPUT);
 }
 
 void loop() {
-
+  // Wait for test button
+  if (digitalRead(PIN_BTN_TEST) == HIGH){
+    Tests::Run();
+  }
 }

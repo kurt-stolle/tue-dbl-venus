@@ -11,6 +11,7 @@
 #define PIN_MOTOR_RIGHT 13
 #define PIN_SERVO_ULTRASOUND 0
 #define PIN_SENSOR_ULTRASOUND 0
+#define PIN_BTN_TEST 2
 
 typedef unsigned char pin;
 

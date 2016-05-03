@@ -13,8 +13,9 @@ class Ultrasonic {
 public:
 	Ultrasonic(pin trig);
 	Ultrasonic(pin trig, pin echo);
+ 
 	// Returns distance in centimeters, -1 if no object found.
-	double doMeasure();
+	double Measure();
 private:
 	pin triggerPin;
 	pin echoPin;

@@ -41,14 +41,14 @@ void RobotController::Reverse(int speed) {
 }
 
 void RobotController::Turn(double deg) {
-	if (deg > 0.0)
+	if (deg > 0.0){
 		this->addAction(Action::TURNING_RIGHT);
-	else
+	} else {
 		this->addAction(Action::TURNING_LEFT);
-
-	this->wheelLeft.write(90 - Speed::HALF);
-	this->wheelRight.write(90 + Speed::HALF);
-	delay(500); // Approximate value. To be determined..
+	}
+ 
+	this->wheelLeft.write(90 + Speed::HALF);
+	this->wheelRight.write(90 - Speed::HALF);
 
 	this->Forward(Speed::NONE);
 }

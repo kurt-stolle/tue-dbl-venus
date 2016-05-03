@@ -37,7 +37,7 @@ public:
 	RobotController();
 	void Forward(int speed);
   void Reverse(int speed);
-	void Turn(double ang);          // Turning (left is negative, right positive)
+	void Turn(double deg);          // Turning (left is negative, right positive)
 	void Grab();                    // Grabbing
 	void Scan();                            // Perform one sweep
 	bool IsPerforming(Action::Action a);    // Check whether an action is being performed
