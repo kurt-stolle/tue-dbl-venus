@@ -1,13 +1,14 @@
 /*
  *  TU/e Venus OGO
  *  Controller
- *  Header
+ *  Acts as interface to the robot hardware
  */
 
 #ifndef RobotController_h
 #define RobotController_h
 
 #include <Servo.h>
+#include "Ultrasonic.h"
 
  // Enumerations for state
 namespace Action {
@@ -31,23 +32,35 @@ namespace Speed {
 	};
 };
 
-// Controller is a class that handles electronics of our venus robot
 class RobotController {
 public:
 	RobotController();
+
 	void Forward(int speed);
   void Reverse(int speed);
-	void Turn(double deg);          // Turning (left is negative, right positive)
-	void Grab();                    // Grabbing
+	void Turn(double deg);									// Turning (left is negative, right positive)
+	void UpdateMovement();
+
+	void Grab();														// Grabbing
 	void Scan();                            // Perform one sweep
+	void USListen();												// Listens for response to Scan()
+	double getUSDistance();									// Retrieves main US sensor data
+
 	bool IsPerforming(Action::Action a);    // Check whether an action is being performed
 private:
 	void addAction(Action::Action a);       // Set a state flag
 	void removeAction(Action::Action a);    // Unset a state flag
 	int state;                              // The current state of the robot, collection of actions defined above
+	double usDistance;
+
+	// Sensors & actuators
 	Servo wheelLeft;
 	Servo wheelRight;
+	int wheelLeftSpeed = Speed::NONE;
+	int wheelRightSpeed = Speed::NONE;
+	int movementSpeed;
 	Servo usSensorServo;
+	Ultrasonic usSensorMain;
 };
 
 #endif

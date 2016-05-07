@@ -1,7 +1,7 @@
 /*
  *  TU/e Venus OGO
  *  Ultrasonic
- *  Header
+ *  Library for US sensors
  */
 
 #ifndef Ultrasonic_h
@@ -11,14 +11,15 @@
 
 class Ultrasonic {
 public:
-	Ultrasonic(pin trig);
-	Ultrasonic(pin trig, pin echo);
- 
+	void Attach(pin trig);
+	void Attach(pin trig, pin echo);
 	// Returns distance in centimeters, -1 if no object found.
-	double Measure();
+	double GetDistance();
+	void SendPulse();
 private:
 	pin triggerPin;
 	pin echoPin;
+	unsigned long echoStart = 0;
 };
 
 #endif

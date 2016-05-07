@@ -1,43 +1,38 @@
 #include "Arduino.h"
 #include "Ultrasonic.h"
 
-/*
-   Constructor
-*/
-Ultrasonic::Ultrasonic(pin trig) {
+void Ultrasonic::Attach(pin trig) {
   this->triggerPin = trig;
   this->echoPin = trig;
 }
 
-Ultrasonic::Ultrasonic(pin trig, pin echo) {
+void Ultrasonic::Attach(pin trig, pin echo) {
   this->triggerPin = trig;
   this->echoPin = echo;
 }
 
-/*
-   Public methods
-*/
+void Ultrasonic::SendPulse() {
+	/* Pinmode here for compatibility with US which uses
+	the same pins for trig and echo... */
 
-double Ultrasonic::Measure() {
-  unsigned long duration;
+	pinMode(this->triggerPin, OUTPUT);
+	digitalWrite(this->triggerPin, LOW);
 
-  /*
-     Pinmode here for compatibility with US which uses
-     the same pins for trig and echo...
-  */
+	delayMicroseconds(2);
+	digitalWrite(this->triggerPin, HIGH);
 
-  pinMode(this->triggerPin, OUTPUT);
-  digitalWrite(this->triggerPin, LOW);
+	delayMicroseconds(10);
+	digitalWrite(this->triggerPin, LOW);
+}
 
-  delayMicroseconds(2);
-  digitalWrite(this->triggerPin, HIGH);
+double Ultrasonic::GetDistance() {
+	switch (digitalRead(this->echoPin)) {
+	case HIGH:
+		this->echoStart = micros();
+		break;
+	case LOW:
+		return (micros() - echoStart) / 58.0;
+	}
 
-  delayMicroseconds(10);
-  digitalWrite(this->triggerPin, LOW);
-
-  // Default pulseIn timeout is 1s, enough?
-  pinMode(this->echoPin, INPUT);
-  duration = pulseIn(this->echoPin, HIGH);
-
-  return duration > 0 ? duration / 58.0 : -1;
+	return -1;
 }

@@ -12,6 +12,7 @@ ControlThread::ControlThread(void (*f)()) {
 
 void ControlThread::run() {
   this->runtime();
+  runned();
 }
 
 

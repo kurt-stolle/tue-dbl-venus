@@ -2,19 +2,13 @@
 #include "RobotController.h"
 #include "Layout.h"
 
-
-/*
- * Constructor
- */
 RobotController::RobotController() {
 	this->wheelRight.attach(PIN_MOTOR_RIGHT);
 	this->wheelLeft.attach(PIN_MOTOR_LEFT);
 	this->usSensorServo.attach(PIN_SERVO_ULTRASOUND);
+	this->usSensorMain.Attach(PIN_ECHO_ULTRASOUND);
 }
 
-/*
- * Public methods
- */
 void RobotController::Forward(int speed) {
 	// Stop
 	if (speed == Speed::NONE) {
@@ -32,8 +26,7 @@ void RobotController::Forward(int speed) {
 		this->addAction(Action::MOVING_BACKWARD);
 	}
 
-	this->wheelLeft.write(90 - speed);
-	this->wheelRight.write(90 + speed);
+	this->movementSpeed = abs(speed);
 }
 
 void RobotController::Reverse(int speed) {
@@ -46,28 +39,86 @@ void RobotController::Turn(double deg) {
 	} else {
 		this->addAction(Action::TURNING_LEFT);
 	}
- 
-	this->wheelLeft.write(90 + Speed::HALF);
-	this->wheelRight.write(90 - Speed::HALF);
+}
 
-	//this->Forward(Speed::NONE);
+void RobotController::UpdateMovement() {
+	if (this->IsPerforming(Action::MOVING_FORWARD)) {
+		if (this->IsPerforming(Action::TURNING_LEFT)) {
+			this->wheelLeftSpeed = movementSpeed >> 1; // Divide by 2 ;)
+			this->wheelRightSpeed = movementSpeed;
+
+		} else if (this->IsPerforming(Action::TURNING_RIGHT)) {
+			this->wheelLeftSpeed = movementSpeed;
+			this->wheelRightSpeed = movementSpeed >> 1;
+		}
+		else {
+			this->wheelLeftSpeed = movementSpeed;
+			this->wheelRightSpeed = movementSpeed;
+		}
+	}
+	else if (this->IsPerforming(Action::MOVING_BACKWARD)) {
+		if (this->IsPerforming(Action::TURNING_LEFT)) {
+			this->wheelLeftSpeed = -movementSpeed;
+			this->wheelRightSpeed = -(movementSpeed >> 1);
+		}
+		else if (this->IsPerforming(Action::TURNING_RIGHT)) {
+			this->wheelLeftSpeed = -(movementSpeed >> 1);
+			this->wheelRightSpeed = -movementSpeed;
+		}
+		else {
+			this->wheelLeftSpeed = -movementSpeed;
+			this->wheelRightSpeed = -movementSpeed;
+		}
+	}
+	else {
+		if (this->IsPerforming(Action::TURNING_LEFT)) {
+			this->wheelLeftSpeed = -Speed::HALF;
+			this->wheelRightSpeed = Speed::HALF;
+		}
+		else if (this->IsPerforming(Action::TURNING_RIGHT)) {
+			this->wheelLeftSpeed = Speed::HALF;
+			this->wheelRightSpeed = -Speed::HALF;
+		}
+		else {
+			this->wheelLeftSpeed = Speed::NONE;
+			this->wheelRightSpeed = Speed::NONE;
+		}
+	}
+
+	this->wheelLeft.write(90 + this->wheelLeftSpeed);
+	this->wheelRight.write(90 - this->wheelRightSpeed);
 }
 
 void RobotController::Grab() {
-
+	// TODO
 }
 
 void RobotController::Scan() {
-
+	this->addAction(Action::SCANNING);
+	this->usSensorMain.SendPulse();
 }
+
+void RobotController::USListen() {
+	double distance = this->usSensorMain.GetDistance();
+
+	if (distance != -1) {
+		this->usDistance = distance;
+		this->removeAction(Action::SCANNING);
+	}
+}
+
+double RobotController::getUSDistance() {
+	return this->usDistance;
+}
+
+/*
+ * State control
+ */
 
 bool RobotController::IsPerforming(Action::Action a) {
 	return (this->state & a);
 }
 
-/*
- * Private methods
- */
 void RobotController::addAction(Action::Action a) {
 	this->state = this->state | a;
 }
