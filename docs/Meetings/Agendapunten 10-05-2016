@@ -1,0 +1,19 @@
+Meeting agenda 10-05-2016
+
+1. Goals last week
+    - Testing of driving & ultrasonic actuators.
+    - Utility functions & 'multithreading' (ISR).
+    - Ghantt chart.
+    - Simple test sequence.
+2. Design report
+    - Peer reviews.
+    - Peer reviews of our report (by friends).
+3. Goals for the coming week
+    - Strategy (!!)
+    - Finalize ultrasonic & driving functions to be able 
+    to focus on other stuff in programming.
+    - More points to be discussed.
+4. New task division
+    - Programming / Strategy / Documentation.
+5. AOB
+    
