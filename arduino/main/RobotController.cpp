@@ -6,7 +6,7 @@ RobotController::RobotController() {
 	this->wheelRight.attach(PIN_MOTOR_RIGHT);
 	this->wheelLeft.attach(PIN_MOTOR_LEFT);
 	this->usSensorServo.attach(PIN_SERVO_ULTRASOUND);
-	this->usSensorMain.Attach(PIN_ECHO_ULTRASOUND);
+	this->usSensorMain.Attach(PIN_TRIGGER_ULTRASOUND, PIN_ECHO_ULTRASOUND);
 }
 
 void RobotController::Forward(int speed) {
@@ -36,13 +36,18 @@ void RobotController::Reverse(int speed) {
 void RobotController::Turn(double deg) {
 	if (deg > 0.0){
 		this->addAction(Action::TURNING_RIGHT);
+	} else if(deg == 0.0) {
+	  this->removeAction(Action::TURNING_RIGHT);
+    this->removeAction(Action::TURNING_LEFT);
 	} else {
 		this->addAction(Action::TURNING_LEFT);
 	}
 }
 
 void RobotController::UpdateMovement() {
-	if (this->IsPerforming(Action::MOVING_FORWARD)) {
+  //Serial.println("UpdateMovement");
+  
+	if (this->IsPerforming(Action::MOVING_FORWARD)) {    
 		if (this->IsPerforming(Action::TURNING_LEFT)) {
 			this->wheelLeftSpeed = movementSpeed >> 1; // Divide by 2 ;)
 			this->wheelRightSpeed = movementSpeed;
@@ -52,8 +57,8 @@ void RobotController::UpdateMovement() {
 			this->wheelRightSpeed = movementSpeed >> 1;
 		}
 		else {
-			this->wheelLeftSpeed = movementSpeed;
-			this->wheelRightSpeed = movementSpeed;
+			this->wheelLeftSpeed = Speed::FULL;
+			this->wheelRightSpeed = Speed::FULL;
 		}
 	}
 	else if (this->IsPerforming(Action::MOVING_BACKWARD)) {
@@ -85,8 +90,8 @@ void RobotController::UpdateMovement() {
 		}
 	}
 
-	this->wheelLeft.write(90 + this->wheelLeftSpeed);
-	this->wheelRight.write(90 - this->wheelRightSpeed);
+	this->wheelLeft.write(1500 + this->wheelLeftSpeed);
+	this->wheelRight.write(1500 - this->wheelRightSpeed);
 }
 
 void RobotController::Grab() {
@@ -94,7 +99,12 @@ void RobotController::Grab() {
 }
 
 void RobotController::Scan() {
-	this->addAction(Action::SCANNING);
+  if(this->IsPerforming(Action::SCANNING)) {
+    this->usDistance = DISTANCE_INFINITE;
+  } else {
+    this->addAction(Action::SCANNING);
+  }
+  
 	this->usSensorMain.SendPulse();
 }
 
@@ -105,6 +115,9 @@ void RobotController::USListen() {
 		this->usDistance = distance;
 		this->removeAction(Action::SCANNING);
 	}
+
+ Serial.print("Distance: ");
+ Serial.println(distance);
 }
 
 double RobotController::getUSDistance() {

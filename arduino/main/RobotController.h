@@ -7,8 +7,10 @@
 #ifndef RobotController_h
 #define RobotController_h
 
-#include <Servo.h>
+#include <ServoTimer2.h>
 #include "Ultrasonic.h"
+
+#define DISTANCE_INFINITE 10000
 
  // Enumerations for state
 namespace Action {
@@ -51,7 +53,7 @@ private:
 	void addAction(Action::Action a);       // Set a state flag
 	void removeAction(Action::Action a);    // Unset a state flag
 	int state;                              // The current state of the robot, collection of actions defined above
-	double usDistance;
+	double usDistance = DISTANCE_INFINITE;
 
 	// Sensors & actuators
 	Servo wheelLeft;

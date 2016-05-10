@@ -19,6 +19,7 @@ public:
 private:
 	pin triggerPin;
 	pin echoPin;
+  bool validResponse = false;
 	unsigned long echoStart = 0;
 };
 

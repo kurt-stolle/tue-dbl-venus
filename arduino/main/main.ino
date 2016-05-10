@@ -6,17 +6,19 @@
 
 #include "RobotController.h"
 #include "Layout.h"
-#include "TimerOne.h"
 #include "ControlThread.h"
 #include "Ultrasonic.h"
+#include "TimerOne.h"
+
+#define DEBUG true
 
  // General variables
 RobotController* robotController;
 ControlThread* driveThread;
 ControlThread* scanThread;
-bool debugging = false;
 bool debuggingFinished = false;
 unsigned short count = 0;
+unsigned long lastPulse;
 
 // Interrupt functions
 void driveCallback();
@@ -33,7 +35,7 @@ void loop();
  */
 
 void setup() {
-	/* Sets up serial debugging, intializes a robot, registers threads
+	/* Sets up serial DEBUG, intializes a robot, registers threads
 	and their callbacks and creates a timer for the thread execution. */
 
 	Serial.begin(9600);
@@ -45,8 +47,8 @@ void setup() {
 	scanThread = new ControlThread(scanCallback);
 	attachInterrupt(digitalPinToInterrupt(PIN_ECHO_ULTRASOUND), echoCallback, CHANGE);
 
-	Timer1.initialize(10 * 1000);
-	Timer1.attachInterrupt(timerCallback);
+  Timer1.initialize(10000 * 1000);
+  Timer1.attachInterrupt(timerCallback);
 }
 
 void timerCallback() {
@@ -65,15 +67,20 @@ void loop() {
 	to the interrupt callbacks */
 
 	// Test routine
-	if (debugging) {
+	if (DEBUG) {
+    Serial.println("Starting test routine");
+    
 		if (debuggingFinished) {
-			Serial.println("Debugging ended...");
+			Serial.println("DEBUG ended...");
 			delay(5000);
 			return;
 		}
 
 		robotController->Forward(Speed::FULL);
-		while (robotController->getUSDistance() == -1 || robotController->getUSDistance() < 5.0) {}
+		while (robotController->getUSDistance() > 5.0) {
+		  //Serial.println(robotController->getUSDistance());  
+		}
+    delay(5000);
 		robotController->Reverse(Speed::HALF);
 		delay(500);
 		robotController->Turn(-90);
@@ -94,31 +101,35 @@ void driveCallback() {
 	/* Handles all tasks concerning the driving state of
 	the robot (updating servo acceleration etc.) */
 
-	if (debugging) {
+	if (DEBUG) {
 		Serial.println("driveCallback thread");
 	}
 
-	// TODO
+	robotController->UpdateMovement();
 }
 
 void scanCallback() {
 	/* Sends a pulse from the main ultrasonic sensor
 	on the head of the robot */
 
-	if (debugging) {
+	if (DEBUG) {
 		Serial.println("scanCallback thread");
 	}
 
 	robotController->Scan();
+  lastPulse = micros();
 }
 
 void echoCallback() {
 	/* Listens to a response from the robot's US sensor
 	and sets its distance variable to a new value */
 
-	if (debugging) {
+  Serial.print("Pin is: ");
+  Serial.println(digitalRead(PIN_ECHO_ULTRASOUND));
+
+	if (DEBUG) {
 		Serial.println("ultrasonic echo pin change");
 	}
 
-	robotController->USListen();
+  //robotController->USListen();
 }
