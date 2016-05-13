@@ -1,0 +1,11 @@
+Network Configuration
+
+Network ID: 1991
+Network Channel: 11
+Baud rate: 9600
+Network address:
+	- Robot 1: AAA1
+	- Robot 2: AAA2
+Destination:
+	- Robot 1: FFFF (= all robots)
+	- Robot 2: FFFF
