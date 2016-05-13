@@ -81,6 +81,7 @@ void loop() {
       delay(300);
 		}
     robotController->Forward(Speed::NONE);
+    delay(1000);
 
 		count++;
 

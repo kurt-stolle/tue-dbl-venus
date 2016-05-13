@@ -44,9 +44,7 @@ void RobotController::Turn(double deg) {
 	}
 }
 
-void RobotController::UpdateMovement() {
-  //Serial.println("UpdateMovement");
-  
+void RobotController::UpdateMovement() {  
 	if (this->IsPerforming(Action::MOVING_FORWARD)) {    
 		if (this->IsPerforming(Action::TURNING_LEFT)) {
 			this->wheelLeftSpeed = movementSpeed >> 1; // Divide by 2 ;)
@@ -57,8 +55,8 @@ void RobotController::UpdateMovement() {
 			this->wheelRightSpeed = movementSpeed >> 1;
 		}
 		else {
-			this->wheelLeftSpeed = Speed::FULL;
-			this->wheelRightSpeed = Speed::FULL;
+			this->wheelLeftSpeed = movementSpeed;
+			this->wheelRightSpeed = movementSpeed;
 		}
 	}
 	else if (this->IsPerforming(Action::MOVING_BACKWARD)) {
