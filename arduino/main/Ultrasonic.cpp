@@ -20,11 +20,8 @@ void Ultrasonic::SendPulse() {
 	/* Pinmode here for compatibility with US which uses
 	the same pins for trig and echo... */
 
-  noInterrupts();
-
-  this->validResponse = false;
-
 	pinMode(this->triggerPin, OUTPUT);
+  
 	digitalWrite(this->triggerPin, LOW);
 
 	delayMicroseconds(2);
@@ -34,25 +31,24 @@ void Ultrasonic::SendPulse() {
 	digitalWrite(this->triggerPin, LOW);
 
   pinMode(this->triggerPin, INPUT);
-
-  this->validResponse = true;
-
-  interrupts();
 }
 
 double Ultrasonic::GetDistance() {
-  if (!this->validResponse) return -1.0;
-  
-  Serial.print("US pin: ");
-  Serial.println(digitalRead(this->echoPin) ? "HIGH" : "LOW");
+  double distance = -1;
   
 	switch (digitalRead(this->echoPin)) {
 	case HIGH:
+    this->validResponse = true;
 		this->echoStart = micros();
 		break;
-	case LOW:
-		return (micros() - this->echoStart) / 58.0;
+	case LOW:    
+    if(this->validResponse) {
+      distance = (micros() - this->echoStart) / 58.0;
+    }
+
+    this->validResponse = false;
+    break;
 	}
 
-	return -1;
+	return distance;
 }

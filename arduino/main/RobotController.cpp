@@ -115,9 +115,6 @@ void RobotController::USListen() {
 		this->usDistance = distance;
 		this->removeAction(Action::SCANNING);
 	}
-
- Serial.print("Distance: ");
- Serial.println(distance);
 }
 
 double RobotController::getUSDistance() {
