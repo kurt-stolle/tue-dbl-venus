@@ -76,8 +76,7 @@ void loop() {
     Serial.println("Starting test routine");
 
 		robotController->Forward(Speed::FULL);
-		while (robotController->getUSDistance() > 10.0) {
-		  Serial.println(robotController->getUSDistance());  
+		while (robotController->GetUSDistance() > 10.0) { 
       delay(300);
 		}
     robotController->Forward(Speed::NONE);

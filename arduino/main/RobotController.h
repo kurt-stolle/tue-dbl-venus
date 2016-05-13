@@ -30,7 +30,9 @@ namespace Speed {
 	enum Speed {
 		NONE = 0,
 		HALF = 45,
-		FULL = 90
+		FULL = 90,
+    HALF_REVERSE = -45,
+    FULL_REVERSE = -90
 	};
 };
 
@@ -46,23 +48,32 @@ public:
 	void Grab();														// Grabbing
 	void Scan();                            // Perform one sweep
 	void USListen();												// Listens for response to Scan()
-	double getUSDistance();									// Retrieves main US sensor data
+	double GetUSDistance();									// Retrieves main US sensor data
 
 	bool IsPerforming(Action::Action a);    // Check whether an action is being performed
 private:
 	void addAction(Action::Action a);       // Set a state flag
 	void removeAction(Action::Action a);    // Unset a state flag
 	int state;                              // The current state of the robot, collection of actions defined above
-	double usDistance = DISTANCE_INFINITE;
+  double lastMovementUpdate;
 
-	// Sensors & actuators
+	// Servo wheels
 	Servo wheelLeft;
 	Servo wheelRight;
-	int wheelLeftSpeed = Speed::NONE;
-	int wheelRightSpeed = Speed::NONE;
+	
+
+  // The current movement speed
+  int wheelLeftSpeed;
+  int wheelRightSpeed;
 	int movementSpeed;
+
+  //  Ultrasonic sensor
 	Servo usSensorServo;
 	Ultrasonic usSensorMain;
+  double usDistance = DISTANCE_INFINITE;
+
+  // Target
+  double turnTarget; // The turning target, set by the Turn function and used to control how far we are turning 
 };
 
 #endif
