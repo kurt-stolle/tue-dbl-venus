@@ -1,0 +1,12 @@
+Low range IR-sensor:
+White: > 50 (* 4.9mV)
+Black: < 10 (* 4.9mV)
+
+Long range IR-sensor:
+--
+
+To Do:
+- new LED long range sensor
+- 10k resistor --> 100k on long range sensor
+- testing transistors long Range
+- Short range sensor investigate strange behavior
