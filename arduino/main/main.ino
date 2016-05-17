@@ -10,9 +10,25 @@
 #include "Ultrasonic.h"
 #include "TimerOne.h"
 
-#define DEBUG true
+/*
+ * Possible algorithms:
+ * 1 - Debug mode (testing routine)
+ * 2 - Calibration mode (sets the wheels to move at speed 0 without disabling them)
+ * 3 - Venus mode (venus exploration routine)
+ */
+#define ALGORITHM 1
 
- // General variables
+
+/*
+ * Algorithm specific variables
+ */
+#if ALGORITHM == 2
+Servo wheelLeft, wheelRight;
+#endif
+
+/*
+ * General variables
+ */
 RobotController* robotController;
 ControlThread* driveThread;
 ControlThread* scanThread;
@@ -34,19 +50,30 @@ void loop();
  */
 
 void setup() {
-	/* Sets up serial DEBUG, intializes a robot, registers threads
-	and their callbacks and creates a timer for the thread execution. */
-	Serial.begin(9600);
-	Serial.println("Start debug");
 
+  // Serial should not be possible in Venus mode
+#if ALGORITHM == 1
+  Serial.begin(9600);
+  Serial.println("Starting in DEBUG mode");
+#elif ALGORITHM == 2
+  wheelLeft.attach(PIN_MOTOR_LEFT);
+  wheelRight.attach(PIN_MOTOR_RIGHT);
+  
+  Serial.begin(9600);
+  Serial.println("Starting in CALIBRATION mode");
+#endif
+  
+  // Create an instance for the robot controller
 	robotController = new RobotController();
 
+  // Setup threads
 	driveThread = new ControlThread(driveCallback);
 	scanThread = new ControlThread(scanCallback);
-  
+
+  // Attach an interrupt for the ultrasound
 	attachInterrupt(digitalPinToInterrupt(PIN_ECHO_ULTRASOUND), echoCallback, CHANGE);
 
-  Timer1.initialize(100 * 1000L);
+  Timer1.initialize(10 * 1000L);
   Timer1.attachInterrupt(timerCallback);
 }
 
@@ -65,29 +92,30 @@ void loop() {
 	/* Executes main algorithm, leaving fast concurrent tasks
 	to the interrupt callbacks */
 
-	// Test routine
-	if (DEBUG) {   
-		if (debuggingFinished) {
-			Serial.println("DEBUG ended...");
-			delay(5000);
-			return;
-		}
-
-    Serial.println("Starting test routine");
-
+#if ALGORITHM == 1 /* Debug mode */
+    
 		robotController->Forward(Speed::FULL);
+    robotController->Turn(90); // Turn 90 degrees and continue forward
+    
 		while (robotController->GetUSDistance() > 10.0) { 
       delay(300);
 		}
     robotController->Forward(Speed::NONE);
-    delay(1000);
 
-		count++;
+    delay(5 * 1000);
+    
+#elif ALGORITHM == 2 /* Calibration mode */
 
-		if (count >= 3) {
-			debuggingFinished = true;
-		}
-	}
+  wheelLeft.write(1500);
+  wheelRight.write(1500);
+
+  delay(100000);
+  
+#elif ALGORITHM == 3 /* Venus mode */
+
+  robotController->Forward(Speed::FULL);
+  
+#endif
 }
 
 void driveCallback() {
@@ -107,12 +135,6 @@ void scanCallback() {
 void echoCallback() {
 	/* Listens to a response from the robot's US sensor
 	and sets its distance variable to a new value */
-
-  //Serial.println(digitalRead(2));
-
-	/*if (DEBUG) { DON'T CALL LIBRARY FUNCTIONS IN INTERRUPTS
-		Serial.println("ultrasonic echo pin change");
-	}*/
 
   robotController->USListen();
 }

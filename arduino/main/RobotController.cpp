@@ -8,17 +8,17 @@ double degToMs(double deg){
   if (deg < -90) deg = 90;
   if (deg > 90) deg = 90;
   
-  return map(deg, -90, 90, 544, 2400);
+  return map(deg, -90, 90, 1000, 2000);
 }
 
 // Constructor
 RobotController::RobotController() {
-	this->wheelRight.attach(PIN_MOTOR_RIGHT);
-	this->wheelLeft.attach(PIN_MOTOR_LEFT);
 	this->usSensorServo.attach(PIN_SERVO_ULTRASOUND);
 	this->usSensorMain.Attach(PIN_TRIGGER_ULTRASOUND, PIN_ECHO_ULTRASOUND);
 
   this->lastMovementUpdate = micros();
+
+  this->turnTarget = 0.0;
 }
 
 // Move
@@ -110,14 +110,14 @@ void RobotController::UpdateMovement() {
   double modRight;
 
   // Apply a modulation to the wheel speed
-  if (this->turnTarget > 0){
+  if (this->turnTarget > 0.1){
     // Turn left
     this->removeAction(Action::TURNING_LEFT);
     this->addAction(Action::TURNING_RIGHT);
 
     modLeft = 1;
     modRight = 0;
-  } else if (this->turnTarget < 0){
+  } else if (this->turnTarget < -0.1){
     // Turn right
     this->addAction(Action::TURNING_LEFT);
     this->removeAction(Action::TURNING_RIGHT);
@@ -128,36 +128,58 @@ void RobotController::UpdateMovement() {
     // Do not turn - no modulation needed
     this->removeAction(Action::TURNING_LEFT);
     this->removeAction(Action::TURNING_RIGHT);
+
+    modLeft = 1;
+    modRight = 1;
   }
 
   // Calculate the delta for how far we have turned (and moved) since last time
   double dSRight,dSLeft;
   {
-    double dT = micros() - this->lastMovementUpdate; // Time delta in microseconds
-    this->lastMovementUpdate = micros();
-  
-    double cExp = ((WHEEL_RPM_FULL * dT / 60000000.) / ( this->IsPerforming(Action::MOVING_BACKWARD) ? Speed::FULL_REVERSE : Speed::FULL)); // Intermediate value
+    unsigned long T = micros();
+    unsigned long dT = T - this->lastMovementUpdate; // Time delta in microseconds
+    this->lastMovementUpdate = T;
+
+    long double maxRotations = (WHEEL_RPM_FULL * dT / 600000.); // Rotations if speed would be maximum
+    double maxSpeed = degToMs( this->IsPerforming(Action::MOVING_BACKWARD) ? Speed::FULL_REVERSE : Speed::FULL );
     
-    double dTurnRight = cExp * this->wheelRight.read(); // Turning deltas
-    double dTurnLeft = 0 * this->wheelLeft.read();
-  
-    dSRight = (2 * PI * WHEEL_RADIUS) * dTurnRight; // Distance deltas
-    dSLeft = (2 * PI * WHEEL_RADIUS) * dTurnLeft;
+    dSRight = (2 * PI * WHEEL_RADIUS) * maxRotations * ( this->wheelRight.read() / maxSpeed ); // Distance deltas
+    dSLeft  = (2 * PI * WHEEL_RADIUS) * maxRotations * (this->wheelLeft.read() / maxSpeed);
   }
   
   // When the delta of right is greater than the delta of left, then we must have been turning. We need to calculate the angle and remove it from the target.
   if (dSRight > dSLeft )  {
-    turnTarget -= dSRight / WHEEL_DISTANCE_APART * (3.14159265 / 180.);
+    turnTarget -= dSRight / WHEEL_DISTANCE_APART * (PI / 180.);
   } else if (dSLeft > dSRight) {
-    turnTarget += dSLeft / WHEEL_DISTANCE_APART * (3.14159265 / 180.);
+    turnTarget += dSLeft / WHEEL_DISTANCE_APART * (PI / 180.);
   }
 
+  // Debug
   Serial.print("R: "); Serial.print(dSRight); Serial.print(" L: "); Serial.print(dSLeft); Serial.print("\n");
 
 
   // Apply our calculations
-  this->wheelLeft.write(1500 + degToMs(speed * modLeft));
-  this->wheelRight.write(1500 - degToMs(speed * modRight));
+  double leftSpeed = speed * modLeft;
+  double rightSpeed = speed * modRight;
+  if (leftSpeed < 1){
+    this->wheelLeft.detach();
+  } else {
+    if (!this->wheelLeft.attached()){
+      this->wheelLeft.attach(PIN_MOTOR_LEFT);
+    }
+
+    
+    this->wheelLeft.write(degToMs(-leftSpeed));
+  }
+  if (rightSpeed < 1 ){
+    this->wheelRight.detach();
+  } else {
+    if (!this->wheelRight.attached()){
+      this->wheelRight.attach(PIN_MOTOR_RIGHT);
+    }
+    
+    this->wheelRight.write(degToMs(rightSpeed));
+  }
 }
 
 

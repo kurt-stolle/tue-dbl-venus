@@ -9,9 +9,9 @@
 
 #include "ServoTimer2.h"
 
-#define WHEEL_RPM_FULL 90 // RPM when on full power ahead
-#define WHEEL_RADIUS 1 / 100 // metres
-#define WHEEL_DISTANCE_APART 10 / 100 // Distance the wheels are apart in metres
+#define WHEEL_RPM_FULL 55 // RPM when on full power ahead, according to docs this value is between 50 and 60
+#define WHEEL_RADIUS 2.75 / 100 // metres
+#define WHEEL_DISTANCE_APART 9 / 100 // Distance the wheels are apart in metres
 
 #define PIN_MOTOR_LEFT 12
 #define PIN_MOTOR_RIGHT 13
