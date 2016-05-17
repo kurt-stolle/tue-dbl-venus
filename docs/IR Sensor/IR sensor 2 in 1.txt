@@ -1,0 +1,11 @@
+0.3 mA Emitter current
+5V Collector - Emitter voltage
+3 kOhm
+
+When dark:
+0.02 mA
+Output: 0.06 V
+
+When white:
+0.4 mA
+Output: 1.2 V

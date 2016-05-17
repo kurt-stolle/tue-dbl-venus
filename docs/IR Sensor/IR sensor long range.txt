@@ -1,0 +1,8 @@
+LED:
+1.3 V
+Serie resistor: 33 Ohm
+
+Transistor:
+Max output: 1.20 mA
+Min output: 0.02 mA
+at 10 cm: 0.05 mA
