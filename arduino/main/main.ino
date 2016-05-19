@@ -50,16 +50,16 @@ void loop();
  */
 
 void setup() {
+  Serial.begin(9600);
 
   // Serial should not be possible in Venus mode
+  // Actually it should, because wireless comm. needs it
 #if ALGORITHM == 1
-  Serial.begin(9600);
   Serial.println("Starting in DEBUG mode");
 #elif ALGORITHM == 2
   wheelLeft.attach(PIN_MOTOR_LEFT);
   wheelRight.attach(PIN_MOTOR_RIGHT);
   
-  Serial.begin(9600);
   Serial.println("Starting in CALIBRATION mode");
 #endif
   
