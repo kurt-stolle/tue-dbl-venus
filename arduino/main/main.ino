@@ -94,7 +94,7 @@ void loop() {
 
 #if ALGORITHM == 1 /* Debug mode */
     
-		robotController->Forward(Speed::FULL);
+		//robotController->Forward(Speed::FULL);
     
 	/*	while (robotController->GetUSDistance() > 10.0) { 
       delay(300);
@@ -118,7 +118,7 @@ void loop() {
   
 #elif ALGORITHM == 3 /* Venus mode */
 
-  robotController->Forward(Speed::FULL);
+  //robotController->Forward(Speed::FULL);
   
 #endif
 }
