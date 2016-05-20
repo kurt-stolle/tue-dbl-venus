@@ -14,7 +14,7 @@ static servo_t servos[NBR_CHANNELS+1];    // static array holding servo data for
 static volatile uint8_t Channel;   // counter holding the channel being pulsed
 static volatile uint8_t ISRCount;  // iteration counter used in the interrupt routines;
 uint8_t ChannelCount = 0;	    // counter holding the number of attached channels
-static boolean isStarted = false;  // flag to indicate if the ISR has been initialised
+static bool isStarted = false;  // flag to indicate if the ISR has been initialised
 
 ISR (TIMER2_OVF_vect)
 {
@@ -84,7 +84,7 @@ int ServoTimer2::read()
    return pulsewidth;
 }
 
-boolean ServoTimer2::attached()
+bool ServoTimer2::attached()
 {
     return servos[this->chanIndex].Pin.isActive ;
 }
