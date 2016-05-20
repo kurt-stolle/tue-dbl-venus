@@ -73,7 +73,7 @@ void setup() {
   // Attach an interrupt for the ultrasound
 	attachInterrupt(digitalPinToInterrupt(PIN_ECHO_ULTRASOUND), echoCallback, CHANGE);
 
-  Timer1.initialize(10 * 1000L);
+  Timer1.initialize(100 * 1000L);
   Timer1.attachInterrupt(timerCallback);
 }
 
@@ -95,14 +95,19 @@ void loop() {
 #if ALGORITHM == 1 /* Debug mode */
     
 		robotController->Forward(Speed::FULL);
-    robotController->Turn(90); // Turn 90 degrees and continue forward
     
-		while (robotController->GetUSDistance() > 10.0) { 
+	/*	while (robotController->GetUSDistance() > 10.0) { 
       delay(300);
 		}
+
     robotController->Forward(Speed::NONE);
 
-    delay(5 * 1000);
+    delay(500);
+    
+    robotController->Forward(Speed::FULL);
+    robotController->Turn(90);
+
+    delay(5 * 1000);*/
     
 #elif ALGORITHM == 2 /* Calibration mode */
 

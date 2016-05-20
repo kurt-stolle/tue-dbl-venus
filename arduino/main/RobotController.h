@@ -56,6 +56,7 @@ private:
 	void removeAction(Action::Action a);    // Unset a state flag
 	int state;                              // The current state of the robot, collection of actions defined above
   unsigned long lastMovementUpdate;
+  unsigned long lastUSTurn;
 
 	// Servo wheels
 	Servo wheelLeft;

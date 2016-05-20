@@ -2,18 +2,34 @@
 #include "RobotController.h"
 #include "Layout.h"
 
-// Convert degrees to milliseconds
-double degToMs(double deg){
+/*
+ * Unit conversion
+ */
+#define SERVO_MIN 700
+#define SERVO_MAX 2300
+ 
+static double degToMs(double deg){
   // Thank you, Google.
   if (deg < -90) deg = 90;
   if (deg > 90) deg = 90;
   
-  return map(deg, -90, 90, 1000, 2000);
+  return map(deg, -90, 90, SERVO_MIN, SERVO_MAX);
 }
 
-// Constructor
+static double msToDeg(double ms){
+  if (ms < SERVO_MIN) ms = SERVO_MIN;
+  if (ms > SERVO_MAX) ms = SERVO_MAX;
+
+  return map(ms, SERVO_MIN, SERVO_MAX, -90, 90);
+}
+
+/*
+ * Constructor
+ */
 RobotController::RobotController() {
 	this->usSensorServo.attach(PIN_SERVO_ULTRASOUND);
+  this->usSensorServo.write(degToMs(90));
+  this->lastUSTurn = millis();
 	this->usSensorMain.Attach(PIN_TRIGGER_ULTRASOUND, PIN_ECHO_ULTRASOUND);
 
   this->lastMovementUpdate = micros();
@@ -21,7 +37,9 @@ RobotController::RobotController() {
   this->turnTarget = 0.0;
 }
 
-// Move
+/*
+ * Helper methods
+ */
 void RobotController::Forward(int speed) {
 	// Stop
 	if (speed == Speed::NONE) {
@@ -97,6 +115,20 @@ void RobotController::removeAction(Action::Action a) {
 
 // Update movement thread
 void RobotController::UpdateMovement() {
+  // disable interrupts. important code.
+  noInterrupts();
+  
+  /*
+   * Ultrasonic movement
+   */
+  if (millis() - this->lastUSTurn > CALIBRATION_TIME_US_TURN){
+    this->usSensorServo.write(degToMs(-msToDeg(this->usSensorServo.read())));
+    this->lastUSTurn = millis();
+  }  
+
+  /*
+   * Wheel movement
+   */
   int speed;
   if (this->IsPerforming(Action::MOVING_FORWARD)) {    
     speed = movementSpeed;
@@ -128,7 +160,7 @@ void RobotController::UpdateMovement() {
     // Do not turn - no modulation needed
     this->removeAction(Action::TURNING_LEFT);
     this->removeAction(Action::TURNING_RIGHT);
-
+    this->turnTarget = 0;
     modLeft = 1;
     modRight = 1;
   }
@@ -141,22 +173,21 @@ void RobotController::UpdateMovement() {
     this->lastMovementUpdate = T;
 
     long double maxRotations = (WHEEL_RPM_FULL * dT / 600000.); // Rotations if speed would be maximum
-    double maxSpeed = degToMs( this->IsPerforming(Action::MOVING_BACKWARD) ? Speed::FULL_REVERSE : Speed::FULL );
+    double maxSpeed = this->IsPerforming(Action::MOVING_BACKWARD) ? Speed::FULL_REVERSE : Speed::FULL;
     
-    dSRight = (2 * PI * WHEEL_RADIUS) * maxRotations * ( this->wheelRight.read() / maxSpeed ); // Distance deltas
-    dSLeft  = (2 * PI * WHEEL_RADIUS) * maxRotations * (this->wheelLeft.read() / maxSpeed);
+    dSRight = (2 * PI * WHEEL_RADIUS) * maxRotations * ( (this->wheelRight.attached() ? msToDeg(this->wheelRight.read()) : 0.00 ) / maxSpeed ); // Distance deltas
+    dSLeft  = (2 * PI * WHEEL_RADIUS) * maxRotations * ( (this->wheelLeft.attached() ? msToDeg(this->wheelLeft.read()) : 0.00 ) / maxSpeed);
   }
+
+  
+  Serial.print(dSRight); Serial.print(" : "); Serial.println(dSLeft);
   
   // When the delta of right is greater than the delta of left, then we must have been turning. We need to calculate the angle and remove it from the target.
   if (dSRight > dSLeft )  {
-    turnTarget -= dSRight / WHEEL_DISTANCE_APART * (PI / 180.);
+    this->turnTarget += (dSRight / WHEEL_DISTANCE_APART) * (PI / 180.00);
   } else if (dSLeft > dSRight) {
-    turnTarget += dSLeft / WHEEL_DISTANCE_APART * (PI / 180.);
+    this->turnTarget -= (dSLeft / WHEEL_DISTANCE_APART) * (PI / 180.00);
   }
-
-  // Debug
-  Serial.print("R: "); Serial.print(dSRight); Serial.print(" L: "); Serial.print(dSLeft); Serial.print("\n");
-
 
   // Apply our calculations
   double leftSpeed = speed * modLeft;
@@ -180,6 +211,9 @@ void RobotController::UpdateMovement() {
     
     this->wheelRight.write(degToMs(-rightSpeed));
   }
+
+  // Allow interrupts again.
+  interrupts();
 }
 
 
