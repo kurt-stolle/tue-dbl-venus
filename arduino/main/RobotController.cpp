@@ -169,7 +169,7 @@ void RobotController::UpdateMovement() {
     }
 
     
-    this->wheelLeft.write(degToMs(-leftSpeed));
+    this->wheelLeft.write(degToMs(leftSpeed));
   }
   if (rightSpeed < 1 ){
     this->wheelRight.detach();
@@ -178,7 +178,7 @@ void RobotController::UpdateMovement() {
       this->wheelRight.attach(PIN_MOTOR_RIGHT);
     }
     
-    this->wheelRight.write(degToMs(rightSpeed));
+    this->wheelRight.write(degToMs(-rightSpeed));
   }
 }
 
