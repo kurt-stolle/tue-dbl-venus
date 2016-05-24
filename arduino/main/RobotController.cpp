@@ -33,7 +33,6 @@ RobotController::RobotController() {
 	this->usSensorMain.Attach(PIN_TRIGGER_ULTRASOUND, PIN_ECHO_ULTRASOUND);
 
   this->lastMovementUpdate = micros();
-
   this->turnTarget = 0.0;
   this->state = Action::NONE;
 }
@@ -108,20 +107,16 @@ bool RobotController::IsPerforming(Action::Action a) {
 
 void RobotController::addAction(Action::Action a) {
 	this->state = this->state | a;
-  if(a == Action::MOVING_BACKWARD)
-    Serial.println("FOCKING WOT");
 }
 
 void RobotController::removeAction(Action::Action a) {
-	this->state = this->state ^ a;
+  this->state = this->state & (~a);
 }
 
 // Update movement thread
 void RobotController::UpdateMovement() {
   // disable interrupts. important code.
   noInterrupts();
-
-  Serial.print("State: "); Serial.println(state);
   
   /*
    * Ultrasonic movement
@@ -129,7 +124,7 @@ void RobotController::UpdateMovement() {
   if (millis() - this->lastUSTurn > CALIBRATION_TIME_US_TURN){
     this->usSensorServo.write(degToMs(-msToDeg(this->usSensorServo.read())));
     this->lastUSTurn = millis();
-  }  
+  }
 
   /*
    * Wheel movement
@@ -138,7 +133,7 @@ void RobotController::UpdateMovement() {
   if (this->IsPerforming(Action::MOVING_FORWARD)) {    
     speed = movementSpeed;
   } else if (this->IsPerforming(Action::MOVING_BACKWARD)) {
-    speed = movementSpeed;
+    speed = -movementSpeed;
   } else {
     speed = Speed::NONE;
   }
@@ -147,14 +142,14 @@ void RobotController::UpdateMovement() {
   double modRight;
 
   // Apply a modulation to the wheel speed
-  if (this->turnTarget > 0.1){
+  if (this->turnTarget > 5){
     // Turn left
     this->removeAction(Action::TURNING_LEFT);
     this->addAction(Action::TURNING_RIGHT);
 
     modLeft = 1;
     modRight = 0;
-  } else if (this->turnTarget < -0.1){
+  } else if (this->turnTarget < -5){
     // Turn right
     this->addAction(Action::TURNING_LEFT);
     this->removeAction(Action::TURNING_RIGHT);
@@ -179,21 +174,16 @@ void RobotController::UpdateMovement() {
 
     long double maxRotations = (WHEEL_RPM_FULL * dT / 60000000.); // Rotations if speed would be maximum
     double maxSpeed = this->IsPerforming(Action::MOVING_BACKWARD) ? Speed::FULL_REVERSE : Speed::FULL;
-    Serial.println(maxSpeed);
     
     dSRight = (2 * PI * WHEEL_RADIUS) * maxRotations * ( (this->wheelRight.attached() ? -msToDeg(this->wheelRight.read()) : 0.00 ) / maxSpeed ); // Distance deltas
     dSLeft  = (2 * PI * WHEEL_RADIUS) * maxRotations * ( (this->wheelLeft.attached() ? msToDeg(this->wheelLeft.read()) : 0.00 ) / maxSpeed);
   }
-
-  //Serial.print("Read: "); Serial.print(this->wheelLeft.read()); Serial.print(" : "); Serial.println(this->wheelRight.read());
-  Serial.print(dSRight); Serial.print(" : "); Serial.println(dSLeft);
-  Serial.print(this->wheelRight.read()); Serial.print(" : "); Serial.println(this->wheelLeft.read());
   
   // When the delta of right is greater than the delta of left, then we must have been turning. We need to calculate the angle and remove it from the target.
   if (dSRight > dSLeft )  {
-    this->turnTarget += (dSRight / WHEEL_DISTANCE_APART) * (PI / 180.00);
+    this->turnTarget += (dSRight / WHEEL_DISTANCE_APART) * (180.00 / PI);
   } else if (dSLeft > dSRight) {
-    this->turnTarget -= (dSLeft / WHEEL_DISTANCE_APART) * (PI / 180.00);
+    this->turnTarget -= (dSLeft / WHEEL_DISTANCE_APART) * (180.00 / PI);
   }
 
   // Apply our calculations

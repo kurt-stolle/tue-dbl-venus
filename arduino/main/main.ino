@@ -9,6 +9,7 @@
 #include "ControlThread.h"
 #include "Ultrasonic.h"
 #include "TimerOne.h"
+#include "Infrared.h"
 
 /*
  * Possible algorithms:
@@ -17,7 +18,6 @@
  * 3 - Venus mode (venus exploration routine)
  */
 #define ALGORITHM 1
-
 
 /*
  * Algorithm specific variables
@@ -32,8 +32,7 @@ Servo wheelLeft, wheelRight;
 RobotController* robotController;
 ControlThread* driveThread;
 ControlThread* scanThread;
-bool debuggingFinished = false;
-unsigned short count = 0;
+bool programFinished = false;
 
 // Interrupt functions
 void driveCallback();
@@ -91,24 +90,23 @@ void timerCallback() {
 void loop() {
 	/* Executes main algorithm, leaving fast concurrent tasks
 	to the interrupt callbacks */
+  if(programFinished) {
+    return;
+  }
 
 #if ALGORITHM == 1 /* Debug mode */
-    
-		//robotController->Forward(Speed::FULL);
-    
-	/*	while (robotController->GetUSDistance() > 10.0) { 
-      delay(300);
-		}
 
-    robotController->Forward(Speed::NONE);
-
-    delay(500);
-    
-    robotController->Forward(Speed::FULL);
+    robotController->Forward(Speed::HALF);
     robotController->Turn(90);
-
-    delay(5 * 1000);*/
-    
+    delay(1000000);
+    /*while(robotController->IsPerforming(Action::TURNING_RIGHT));
+    robotController->Reverse(Speed::FULL);
+    delay(1000);
+    robotController->Forward(Speed::FULL);
+    while(robotController->GetUSDistance() > 10.0);
+    robotController->Forward(Speed::NONE);
+    programFinished = true;*/
+		
 #elif ALGORITHM == 2 /* Calibration mode */
 
   wheelLeft.write(1500);

@@ -9,6 +9,9 @@
 
 #include "Layout.h"
 
+#define GRAY_THOLD 10
+#define WHITE_THOLD 50
+
 class Infrared {
   public:
     enum Color {
