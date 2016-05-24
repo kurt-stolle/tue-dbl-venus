@@ -32,6 +32,8 @@ RobotController::RobotController() {
   this->lastUSTurn = millis();
 	this->usSensorMain.Attach(PIN_TRIGGER_ULTRASOUND, PIN_ECHO_ULTRASOUND);
 
+  this->servoGrabber.attach(PIN_SERVO_GRABBER);
+
   this->lastMovementUpdate = micros();
 
   this->turnTarget = 0.0;
@@ -71,9 +73,10 @@ void RobotController::Turn(double deg) {
 }
 
 // Grab an object
-void RobotController::Grab() {
-	// TODO
+void RobotController::Grab(bool grab) {
+	this->servoGrabber.write(grab ? 90 : 0);
 }
+
 
 // Scan using the US sensor
 void RobotController::Scan() {
@@ -153,13 +156,13 @@ void RobotController::UpdateMovement() {
     this->addAction(Action::TURNING_RIGHT);
 
     modLeft = 1;
-    modRight = 0;
+    modRight = -1;
   } else if (this->turnTarget < -0.1){
     // Turn right
     this->addAction(Action::TURNING_LEFT);
     this->removeAction(Action::TURNING_RIGHT);
 
-    modLeft = 0;
+    modLeft = -1;
     modRight = 1;
   } else {
     // Do not turn - no modulation needed

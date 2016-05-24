@@ -94,20 +94,24 @@ void loop() {
 
 #if ALGORITHM == 1 /* Debug mode */
     
-		//robotController->Forward(Speed::FULL);
+		robotController->Forward(Speed::FULL);
+
+    robotController->Grab(true);
     
-	/*	while (robotController->GetUSDistance() > 10.0) { 
+  	while (robotController->GetUSDistance() > 10.0) { 
       delay(300);
 		}
 
+    robotController->Grab(false);
+
     robotController->Forward(Speed::NONE);
 
-    delay(500);
+    delay(300);
     
     robotController->Forward(Speed::FULL);
     robotController->Turn(90);
 
-    delay(5 * 1000);*/
+    delay(5 * 1000);
     
 #elif ALGORITHM == 2 /* Calibration mode */
 

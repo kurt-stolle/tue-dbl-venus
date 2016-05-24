@@ -45,7 +45,7 @@ public:
 	void Turn(double deg);									// Turning (left is negative, right positive)
 	void UpdateMovement();
 
-	void Grab();														// Grabbing
+	void Grab(bool grab);														// Grabbing
 	void Scan();                            // Perform one sweep
 	void USListen();												// Listens for response to Scan()
 	double GetUSDistance();									// Retrieves main US sensor data
@@ -61,6 +61,7 @@ private:
 	// Servo wheels
 	Servo wheelLeft;
 	Servo wheelRight;
+  Servo servoGrabber;
 	
 
   // The current movement speed
