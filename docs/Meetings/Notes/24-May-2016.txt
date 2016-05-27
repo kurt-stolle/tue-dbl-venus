@@ -1,0 +1,23 @@
+Meeting started: 10.10h
+Everyone is present.
+
+Last week.
+- Hardware done except for LEDs
+
+
+Status.
+- strategy: use mountains as reference
+	* make a circle with the whole car, and look with both us.
+	* One robot is inactive near the lab, until the other robot is there.
+	* Location determination through 2 Xbee at the Lab.
+
+This week.
+- for video: remove an xbee and connect it to the PC. And control one robot by PC.
+- Test if the sonic is interfering
+- 
+
+
+Marius: Strategy, documentation
+Niels & Tim: Test new sensors, software for sensors
+Kurt: Communication, grabber
+Loek: ultrasonic
