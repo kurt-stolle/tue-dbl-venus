@@ -45,7 +45,7 @@ public:
 	void Turn(double deg);									// Turning (left is negative, right positive)
 	void UpdateMovement();
 
-	void Grab(bool grab);														// Grabbing
+  void Grab(bool grab);										// Grabbing
 	void Scan();                            // Perform one sweep
 	void USListen();												// Listens for response to Scan()
 	double GetUSDistance();									// Retrieves main US sensor data
@@ -54,7 +54,8 @@ public:
 private:
 	void addAction(Action::Action a);       // Set a state flag
 	void removeAction(Action::Action a);    // Unset a state flag
-	volatile int state;                              // The current state of the robot, collection of actions defined above
+ 
+	volatile int state;                     // The current state of the robot, collection of actions defined above
   unsigned long lastMovementUpdate;
   unsigned long lastUSTurn;
 
@@ -63,19 +64,16 @@ private:
 	Servo wheelRight;
   Servo servoGrabber;
 	
-
   // The current movement speed
-  int wheelLeftSpeed;
-  int wheelRightSpeed;
 	int movementSpeed;
 
   //  Ultrasonic sensor
 	Servo usSensorServo;
 	Ultrasonic usSensorMain;
-  double usDistance = DISTANCE_INFINITE;
+  volatile double usDistance;
 
   // Target
-  double turnTarget; // The turning target, set by the Turn function and used to control how far we are turning 
+  volatile double turnTarget; // The turning target, set by the Turn function and used to control how far we are turning 
 };
 
 #endif

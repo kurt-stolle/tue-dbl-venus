@@ -50,9 +50,7 @@ void loop();
 
 void setup() {
   Serial.begin(9600);
-
-  // Serial should not be possible in Venus mode
-  // Actually it should, because wireless comm. needs it
+  
 #if ALGORITHM == 1
   Serial.println("Starting in DEBUG mode");
 #elif ALGORITHM == 2
@@ -61,7 +59,7 @@ void setup() {
   
   Serial.println("Starting in CALIBRATION mode");
 #endif
-  
+
   // Create an instance for the robot controller
 	robotController = new RobotController();
 
@@ -91,21 +89,21 @@ void loop() {
 	/* Executes main algorithm, leaving fast concurrent tasks
 	to the interrupt callbacks */
   if(programFinished) {
+    Serial.println("Program finished...");
     return;
   }
 
 #if ALGORITHM == 1 /* Debug mode */
 
-    robotController->Forward(Speed::HALF);
-    robotController->Turn(90);
-    delay(1000000);
-    /*while(robotController->IsPerforming(Action::TURNING_RIGHT));
-    robotController->Reverse(Speed::FULL);
+    robotController->Forward(Speed::FULL);
+    while(robotController->GetUSDistance() > 20.0);
+    robotController->Reverse(Speed::HALF);
     delay(1000);
     robotController->Forward(Speed::FULL);
-    while(robotController->GetUSDistance() > 10.0);
+    robotController->Turn(-90);
+    while(robotController->IsPerforming(Action::TURNING_LEFT));
     robotController->Forward(Speed::NONE);
-    programFinished = true;*/
+    programFinished = true;
 
 #elif ALGORITHM == 2 /* Calibration mode */
 

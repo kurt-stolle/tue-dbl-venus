@@ -10,7 +10,7 @@
  
 static double degToMs(double deg){
   // Thank you, Google.
-  if (deg < -90) deg = 90;
+  if (deg < -90) deg = -90;
   if (deg > 90) deg = 90;
   
   return map(deg, -90, 90, SERVO_MIN, SERVO_MAX);
@@ -31,12 +31,12 @@ RobotController::RobotController() {
   this->usSensorServo.write(degToMs(90));
   this->lastUSTurn = millis();
 	this->usSensorMain.Attach(PIN_TRIGGER_ULTRASOUND, PIN_ECHO_ULTRASOUND);
-
   this->servoGrabber.attach(PIN_SERVO_GRABBER);
 
   this->lastMovementUpdate = micros();
   this->turnTarget = 0.0;
   this->state = Action::NONE;
+  this->usDistance = DISTANCE_INFINITE;
 }
 
 /*
@@ -59,7 +59,7 @@ void RobotController::Forward(int speed) {
 		this->addAction(Action::MOVING_BACKWARD);
 	}
 
-	this->movementSpeed = abs(speed);
+	this->movementSpeed = speed;
 }
 
 void RobotController::Reverse(int speed) {
@@ -68,6 +68,14 @@ void RobotController::Reverse(int speed) {
 
 // Turning
 void RobotController::Turn(double deg) {
+  if(deg > 0.0) {
+    this->addAction(Action::TURNING_RIGHT);
+    this->removeAction(Action::TURNING_LEFT);
+  } else {
+    this->addAction(Action::TURNING_LEFT);
+    this->removeAction(Action::TURNING_RIGHT);
+  }
+  
   this->turnTarget = deg;
 }
 
@@ -75,7 +83,6 @@ void RobotController::Turn(double deg) {
 void RobotController::Grab(bool grab) {
 	this->servoGrabber.write(grab ? 90 : 0);
 }
-
 
 // Scan using the US sensor
 void RobotController::Scan() {
@@ -119,7 +126,7 @@ void RobotController::removeAction(Action::Action a) {
 // Update movement thread
 void RobotController::UpdateMovement() {
   // disable interrupts. important code.
-  noInterrupts();
+  //noInterrupts();
   
   /*
    * Ultrasonic movement
@@ -133,39 +140,10 @@ void RobotController::UpdateMovement() {
    * Wheel movement
    */
   int speed;
-  if (this->IsPerforming(Action::MOVING_FORWARD)) {    
+  if (this->IsPerforming(Action::MOVING_FORWARD) || this->IsPerforming(Action::MOVING_BACKWARD)) {    
     speed = movementSpeed;
-  } else if (this->IsPerforming(Action::MOVING_BACKWARD)) {
-    speed = -movementSpeed;
   } else {
     speed = Speed::NONE;
-  }
-
-  double modLeft;
-  double modRight;
-
-  // Apply a modulation to the wheel speed
-  if (this->turnTarget > 5){
-    // Turn left
-    this->removeAction(Action::TURNING_LEFT);
-    this->addAction(Action::TURNING_RIGHT);
-
-    modLeft = 1;
-    modRight = -1;
-  } else if (this->turnTarget < -5){
-    // Turn right
-    this->addAction(Action::TURNING_LEFT);
-    this->removeAction(Action::TURNING_RIGHT);
-
-    modLeft = -1;
-    modRight = 1;
-  } else {
-    // Do not turn - no modulation needed
-    this->removeAction(Action::TURNING_LEFT);
-    this->removeAction(Action::TURNING_RIGHT);
-    this->turnTarget = 0;
-    modLeft = 1;
-    modRight = 1;
   }
 
   // Calculate the delta for how far we have turned (and moved) since last time
@@ -176,24 +154,55 @@ void RobotController::UpdateMovement() {
     this->lastMovementUpdate = T;
 
     long double maxRotations = (WHEEL_RPM_FULL * dT / 60000000.); // Rotations if speed would be maximum
-    double maxSpeed = this->IsPerforming(Action::MOVING_BACKWARD) ? Speed::FULL_REVERSE : Speed::FULL;
     
-    dSRight = (2 * PI * WHEEL_RADIUS) * maxRotations * ( (this->wheelRight.attached() ? -msToDeg(this->wheelRight.read()) : 0.00 ) / maxSpeed ); // Distance deltas
-    dSLeft  = (2 * PI * WHEEL_RADIUS) * maxRotations * ( (this->wheelLeft.attached() ? msToDeg(this->wheelLeft.read()) : 0.00 ) / maxSpeed);
+    dSRight = (2 * PI * WHEEL_RADIUS) * maxRotations * ( (this->wheelRight.attached() ? -msToDeg(this->wheelRight.read()) : 0.00 ) / Speed::FULL ); // Distance deltas
+    dSLeft  = (2 * PI * WHEEL_RADIUS) * maxRotations * ( (this->wheelLeft.attached() ? msToDeg(this->wheelLeft.read()) : 0.00 ) / Speed::FULL );
   }
   
   // When the delta of right is greater than the delta of left, then we must have been turning. We need to calculate the angle and remove it from the target.
-  if (dSRight > dSLeft )  {
-    this->turnTarget += (dSRight / WHEEL_DISTANCE_APART) * (180.00 / PI);
-  } else if (dSLeft > dSRight) {
-    this->turnTarget -= (dSLeft / WHEEL_DISTANCE_APART) * (180.00 / PI);
+  if (dSRight != dSLeft)  {
+    this->turnTarget -= (dSLeft / (WHEEL_DISTANCE_APART / 2.0)) * (180.00 / PI);
+  }
+
+  double modLeft;
+  double modRight;
+
+  // Apply a modulation to the wheel speed
+  if (this->turnTarget > 5.0){
+    // Turn left
+    
+    if(this->turnTarget > 15.0) {
+      modLeft = 1;
+      modRight = -1;
+    } else {
+      modLeft = 0.25;
+      modRight = -0.25;
+    }
+  } else if (this->turnTarget < -5.0){
+    // Turn right
+
+    if(this->turnTarget < -15.0) {
+      modLeft = -1;
+      modRight = 1;
+    } else {
+      modLeft = -0.25;
+      modRight = 0.25;
+    }
+  } else {
+    // Do not turn - no modulation needed
+    this->removeAction(Action::TURNING_LEFT);
+    this->removeAction(Action::TURNING_RIGHT);
+
+    this->turnTarget = 0;
+    modLeft = 1;
+    modRight = 1;
   }
 
   // Apply our calculations
   double leftSpeed = speed * modLeft;
   double rightSpeed = speed * modRight;
    
-  if (leftSpeed < 1){
+  if (abs(leftSpeed) < 1){
     this->wheelLeft.detach();
   } else {
     if (!this->wheelLeft.attached()){
@@ -202,7 +211,7 @@ void RobotController::UpdateMovement() {
     
     this->wheelLeft.write(degToMs(leftSpeed));
   }
-  if (rightSpeed < 1 ){
+  if (abs(rightSpeed) < 1){
     this->wheelRight.detach();
   } else {
     if (!this->wheelRight.attached()){
@@ -212,8 +221,12 @@ void RobotController::UpdateMovement() {
     this->wheelRight.write(degToMs(-rightSpeed));
   }
 
+  //Serial.print(leftSpeed); Serial.print(" : "); Serial.println(rightSpeed);
+  //Serial.print(this->wheelLeft.read()); Serial.print(" : "); Serial.println(this->wheelRight.read());
+  //Serial.println(this->turnTarget);
+
   // Allow interrupts again.
-  interrupts();
+  //interrupts();
 }
 
 
