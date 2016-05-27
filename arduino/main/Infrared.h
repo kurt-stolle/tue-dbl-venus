@@ -9,8 +9,8 @@
 
 #include "Layout.h"
 
-#define GRAY_THOLD 10
-#define WHITE_THOLD 50
+#define GRAY_THOLD 15
+#define WHITE_THOLD 45
 
 class Infrared {
   public:
@@ -20,7 +20,7 @@ class Infrared {
       BLACK = 0
     };
 
-    Infrared(pin measurePin);
+    void Attach(pin measurePin);
     Color GetColor();           // Returns measured color
   private:
     pin measurePin;

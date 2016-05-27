@@ -69,6 +69,7 @@ void setup() {
 
   // Attach an interrupt for the ultrasound
 	attachInterrupt(digitalPinToInterrupt(PIN_ECHO_ULTRASOUND), echoCallback, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(PIN_ECHO_ULTRASOUNDAUX), echoAuxCallback, CHANGE);
 
   Timer1.initialize(100 * 1000L);
   Timer1.attachInterrupt(timerCallback);
@@ -100,9 +101,12 @@ void loop() {
     robotController->Reverse(Speed::HALF);
     delay(1000);
     robotController->Forward(Speed::FULL);
-    robotController->Turn(-90);
+    robotController->Turn(-45);
     while(robotController->IsPerforming(Action::TURNING_LEFT));
     robotController->Forward(Speed::NONE);
+    robotController->Grab(true);
+    delay(2000);
+    robotController->Grab(false);
     programFinished = true;
 
 #elif ALGORITHM == 2 /* Calibration mode */
@@ -138,4 +142,11 @@ void echoCallback() {
 	and sets its distance variable to a new value */
 
   robotController->USListen();
+}
+
+void echoAuxCallback() {
+  /* Listens to a response from the robot's US sensor
+  and sets its distance variable to a new value */
+
+  robotController->USListenAux();
 }

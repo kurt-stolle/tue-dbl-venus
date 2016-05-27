@@ -1,7 +1,7 @@
 #include "Infrared.h"
 #include "Arduino.h"
 
-Infrared::Infrared(pin measurePin) {
+void Infrared::Attach(pin measurePin) {
   this->measurePin = measurePin;
 }
 

@@ -31,6 +31,9 @@ RobotController::RobotController() {
   this->usSensorServo.write(degToMs(90));
   this->lastUSTurn = millis();
 	this->usSensorMain.Attach(PIN_TRIGGER_ULTRASOUND, PIN_ECHO_ULTRASOUND);
+  this->usSensorAux.Attach(PIN_TRIGGER_ULTRASOUNDAUX, PIN_ECHO_ULTRASOUNDAUX);
+  this->irSensorLeft.Attach(0);
+  this->irSensorRight.Attach(1);
   this->servoGrabber.attach(PIN_SERVO_GRABBER);
 
   this->lastMovementUpdate = micros();
@@ -81,7 +84,7 @@ void RobotController::Turn(double deg) {
 
 // Grab an object
 void RobotController::Grab(bool grab) {
-	this->servoGrabber.write(grab ? 90 : 0);
+	this->servoGrabber.write(grab ? degToMs(90) : degToMs(0));
 }
 
 // Scan using the US sensor
@@ -91,8 +94,15 @@ void RobotController::Scan() {
   } else {
     this->addAction(Action::SCANNING);
   }
-  
-	this->usSensorMain.SendPulse();
+
+  if(this->IsPerforming(Action::SCANNINGAUX)) {
+    this->usDistanceAux = DISTANCE_INFINITE;
+  } else {
+    this->addAction(Action::SCANNINGAUX);
+  }
+
+  this->usSensorMain.SendPulse();
+	this->usSensorAux.SendPulse();
 }
 
 // UltraSonic listen
@@ -105,9 +115,22 @@ void RobotController::USListen() {
 	}
 }
 
+void RobotController::USListenAux() {
+  double distance = this->usSensorAux.GetDistance();
+
+  if (distance != -1) {
+    this->usDistanceAux = distance;
+    this->removeAction(Action::SCANNINGAUX);
+  }
+}
+
 // Get the US distance
 double RobotController::GetUSDistance() {
 	return this->usDistance;
+}
+
+double RobotController::GetUSDistanceAux() {
+  return this->usDistanceAux;
 }
 
 // State flag control
@@ -125,8 +148,11 @@ void RobotController::removeAction(Action::Action a) {
 
 // Update movement thread
 void RobotController::UpdateMovement() {
-  // disable interrupts. important code.
-  //noInterrupts();
+  Serial.print("Infrared Left: "); Serial.println(this->irSensorLeft.GetColor());
+  Serial.print("Infrared Right: "); Serial.println(this->irSensorRight.GetColor());
+
+
+
   
   /*
    * Ultrasonic movement
@@ -224,9 +250,6 @@ void RobotController::UpdateMovement() {
   //Serial.print(leftSpeed); Serial.print(" : "); Serial.println(rightSpeed);
   //Serial.print(this->wheelLeft.read()); Serial.print(" : "); Serial.println(this->wheelRight.read());
   //Serial.println(this->turnTarget);
-
-  // Allow interrupts again.
-  //interrupts();
 }
 
 

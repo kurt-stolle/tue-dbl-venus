@@ -9,6 +9,7 @@
 
 #include "ServoTimer2.h"
 #include "Ultrasonic.h"
+#include "Infrared.h"
 
 #define DISTANCE_INFINITE 10000
 
@@ -21,7 +22,8 @@ namespace Action {
   	TURNING_LEFT = 4,
   	TURNING_RIGHT = 8,
   	GRABBING = 16,
-  	SCANNING = 32
+  	SCANNING = 32,
+    SCANNINGAUX = 64,
   };
 };
 
@@ -48,7 +50,9 @@ public:
   void Grab(bool grab);										// Grabbing
 	void Scan();                            // Perform one sweep
 	void USListen();												// Listens for response to Scan()
+  void USListenAux();
 	double GetUSDistance();									// Retrieves main US sensor data
+  double GetUSDistanceAux();
 
 	bool IsPerforming(Action::Action a);    // Check whether an action is being performed
 private:
@@ -70,7 +74,11 @@ private:
   //  Ultrasonic sensor
 	Servo usSensorServo;
 	Ultrasonic usSensorMain;
+  Ultrasonic usSensorAux;
+  Infrared irSensorLeft;
+  Infrared irSensorRight;
   volatile double usDistance;
+  volatile double usDistanceAux;
 
   // Target
   volatile double turnTarget; // The turning target, set by the Turn function and used to control how far we are turning 

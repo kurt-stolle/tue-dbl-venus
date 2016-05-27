@@ -19,6 +19,8 @@
 #define PIN_SERVO_ULTRASOUND 11
 #define PIN_TRIGGER_ULTRASOUND 9 
 #define PIN_ECHO_ULTRASOUND 2 // Needs to be 2 or 3 for interrupts
+#define PIN_TRIGGER_ULTRASOUNDAUX 6
+#define PIN_ECHO_ULTRASOUNDAUX 3 // Needs to be 2 or 3 for interrupts
 
 #define CALIBRATION_TIME_US_TURN 850 // Time in microseconds it takes for the 'head' to make a full turn to left or right at full turning speed
 
