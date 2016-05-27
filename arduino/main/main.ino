@@ -106,7 +106,7 @@ void loop() {
     while(robotController->GetUSDistance() > 10.0);
     robotController->Forward(Speed::NONE);
     programFinished = true;*/
-		
+
 #elif ALGORITHM == 2 /* Calibration mode */
 
   wheelLeft.write(1500);

@@ -13,6 +13,7 @@
 #define WHEEL_RADIUS 2.75 // centimetres
 #define WHEEL_DISTANCE_APART 9 // Distance the wheels are apart in centimetres
 
+#define PIN_SERVO_GRABBER 10
 #define PIN_MOTOR_LEFT 12
 #define PIN_MOTOR_RIGHT 13
 #define PIN_SERVO_ULTRASOUND 11
