@@ -20,10 +20,19 @@ class Infrared {
       BLACK = 0
     };
 
-    void Attach(pin measurePin);
+    void Attach(pin measurePin, bool longRange);
     Color GetColor();           // Returns measured color
   private:
     pin measurePin;
+    int thresholdWhite;
+    int thresholdGray;
+
+    enum Threshold {
+      THRESH_WHITE = 45,
+      THRESH_GRAY = 15,
+      THRESH_LR_WHITE = 100,
+      THRESH_LR_GRAY = 100     
+    };
 };
 
 

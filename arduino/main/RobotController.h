@@ -67,6 +67,8 @@ private:
 	volatile int state;                     // The current state of the robot, collection of actions defined above
   unsigned long lastMovementUpdate;
   unsigned long lastUSTurn;
+  volatile float usAngle;
+  volatile bool usDirection;
 
 	// Servo wheels
 	Servo wheelLeft;
