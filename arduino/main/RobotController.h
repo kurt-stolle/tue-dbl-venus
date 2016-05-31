@@ -10,6 +10,7 @@
 #include "ServoTimer2.h"
 #include "Ultrasonic.h"
 #include "Infrared.h"
+#include "SoftwareSerial.h"
 
 #define DISTANCE_INFINITE 10000
 
@@ -51,6 +52,7 @@ public:
 	void Scan();                            // Perform one sweep
   void Communicate();                     // Listens and sends
 	void USListen();												// Listens for response to Scan()
+  double GetUSAngle();
   void USListenAux();
 	double GetUSDistance();									// Retrieves main US sensor data
   double GetUSDistanceAux();

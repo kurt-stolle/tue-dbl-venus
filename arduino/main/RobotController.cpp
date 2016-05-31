@@ -42,9 +42,9 @@ RobotController::RobotController() {
   this->usDistance = DISTANCE_INFINITE;
 
   // Setup Xbee
-  this->xbee = SoftwareSerial(2,3);
+  this->xbee = new SoftwareSerial(2,3);
   Serial.begin(9600);
-  this->xbee.begin(9600);
+  this->xbee->begin(9600);
 }
 
 /*
@@ -130,6 +130,10 @@ void RobotController::USListenAux() {
 }
 
 // Get the US distance
+double RobotController::GetUSAngle() {
+   return msToDeg(this->usSensorServo.read());
+}
+
 double RobotController::GetUSDistance() {
 	return this->usDistance;
 }
@@ -141,10 +145,10 @@ double RobotController::GetUSDistanceAux() {
 // Comms
 void RobotController::Communicate(){
   if (Serial.available()) { // If data comes in from serial monitor, send it out to XBee
-    this->xbee.write(Serial.read());
+    this->xbee->write(Serial.read());
   }
-  if (this->xbee.available()) { // If data comes in from XBee, send it out to serial monitor
-    Serial.write(this->xbee.read());
+  if (this->xbee->available()) { // If data comes in from XBee, send it out to serial monitor
+    Serial.write(this->xbee->read());
   }
 }
 
@@ -167,8 +171,15 @@ void RobotController::UpdateMovement() {
    * Ultrasonic movement
    */
   if (millis() - this->lastUSTurn > CALIBRATION_TIME_US_TURN){
-    this->usSensorServo.write(degToMs(-msToDeg(this->usSensorServo.read())));
-    this->lastUSTurn = millis();
+    double newPosition = msToDeg(this->usSensorServo.read()) + 45.0;
+    if (newPosition > 90.0){
+      newPosition = -90.0;
+      this->lastUSTurn = millis() + (CALIBRATION_TIME_US_TURN * 5); // allow some extra time to turn back
+    } else {
+      this->lastUSTurn = millis();
+    }
+    this->usSensorServo.write(degToMs(newPosition));
+    
   }
 
   /*
