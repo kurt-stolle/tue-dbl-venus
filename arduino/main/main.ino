@@ -27,6 +27,19 @@
 Servo wheelLeft, wheelRight;
 #endif
 
+#if ALGORITHM == 3
+namespace Procedure {
+  enum Procedure {
+    SWEEP,
+    FINDING_SAMPLE,
+    FINDING_MOUNTAIN,
+    RETURNING_LAB
+  }
+}
+
+Procedure doing = Procedure::SWEEP;
+#endif
+
 /*
  * General variables
  */
@@ -109,7 +122,140 @@ void loop() {
   
 #elif ALGORITHM == 3 /* Scout mode */
 
-  robotController->Forward(Speed::FULL);
+  if(doing == Procedure::SWEEP) {   
+    // Try to find sample
+    robotController->Forward(Speed::HALF);
+    robotController->ToggleUSTurn(false);
+    robotController->Turn(-90);
+    while(robotController->IsPerforming(Action::TURNING_LEFT)) {
+      if((robotController->GetUSDistance() - robotController->GetUSDistanceAux()) > 10.0) {
+        robotController->Turn(0);
+        robotController->Forward(Speed::NONE);
+        doing = Procedure::FINDING_SAMPLE;
+        return;
+      }
+    }
+
+    robotController->Turn(90);
+    while(robotController->IsPerforming(Action::TURNING_RIGHT)) {
+      if((robotController->GetUSDistance() - robotController->GetUSDistanceAux()) > 10.0) {
+        robotController->Turn(0);
+        robotController->Forward(Speed::NONE);
+        doing = Procedure::FINDING_SAMPLE;
+        return;
+      }
+    }
+
+    // Try to find mountain
+    robotController->Turn(-90);
+    while(robotController->IsPerforming(Action::TURNING_LEFT)) {
+      if((robotController->GetUSDistance() - robotController->GetUSDistanceAux()) < 10.0 && robotController->GetUSDistance() < 300.0) {
+        robotController->Turn(0);
+        robotController->Forward(Speed::NONE);
+        doing = Procedure::FINDING_MOUNTAIN;
+        return;
+      }
+    }
+
+    robotController->Turn(90);
+    while(robotController->IsPerforming(Action::TURNING_RIGHT)) {
+      if((robotController->GetUSDistance() - robotController->GetUSDistanceAux()) < 10.0 && robotController->GetUSDistance() < 300.0) {
+        robotController->Turn(0);
+        robotController->Forward(Speed::NONE);
+        doing = Procedure::FINDING_MOUNTAIN;
+        return;
+      }
+    }
+    
+    robotController->Forward(Speed::NONE);
+    doing = Procedure::FINDING_MOUNTAIN;
+    return;
+  } else if(doing == Procedure::FINDING_SAMPLE) {
+    robotController->Forward(Speed::FULL);
+    robotController->ToggleUSTurn(true);
+    while() { // Not reached border
+      // Avoid obstacles with main US and LR infrared, but recover straight line after that
+      if() {
+        
+      } else if(robotController->GetUSDistanceAux() < 10.0) { // And infrared sees white
+        robotController->Forward(Speed::HALF);
+        while(robotController->GetUSDistanceAux() > 5.0); // And infrared sees white
+        robotController->Grab(true);
+        robotController->Forward(Speed::NONE);
+
+        doing = Procedure::RETURNING_LAB;
+        return;
+      }
+    } 
+    
+    robotController->Forward(Speed::FULL);
+    robotController->Turn(180);
+    while(robotController->IsPerforming(TURNING_RIGHT));
+    robotController->Forward(Speed::NONE);
+    
+    return;     
+  } else if(doing == Procedure::FINDING_MOUNTAIN) {
+    robotController->Forward(Speed::FULL);
+    robotController->ToggleUSTurn(false);
+    while() { // Not reached border
+      // Avoid obstacles with LR infrared, but recover straight line after that
+      if() {
+        
+      } else if(robotController->GetUSDistance() < 20.0) { // And infrared sees black: found mountain
+        bool foundPassage = false;
+        short count = 0;
+        double distance = 0.0;
+        robotController->ResetDistTraveled();
+        while(count < 3 && !foundPassage) {
+          robotController->Turn(-90);
+          while(robotController->IsPerforming(Action::TURNING_LEFT));
+          delay(300);
+          robotController->Turn(90);
+          while(robotController->IsPerforming(Action::TURNING_RIGHT));
+          
+          if(robotController->GetUSDistance() < 20.0) {
+            foundPassage = true;
+            break;
+          }
+
+          count++;
+        }
+
+        if(foundPassage) {
+          distance = robotController->GetDistTraveled();
+          // Set US to right
+          while(robotController->GetUSDistance < 20.0);
+          robotController->Turn(90);
+          while(robotController->IsPerforming(Action::TURNING_RIGHT));
+          robotController->ResetDistTraveled();
+          while(robotController->GetDistTraveled() < distance); // AND no mountains/cliffs
+        }
+
+        robotController->Forward(Speed::NONE);
+        doing = Procedure::SWEEP;
+        return;
+      }
+    } 
+
+    robotController->Forward(Speed::FULL);
+    robotController->Turn(180);
+    while(robotController->IsPerforming(TURNING_RIGHT));
+    robotController->Forward(Speed::NONE);
+    
+    doing = Procedure::SWEEP;
+    return;     
+  } else if(doing == Procedure::RETURNING_LAB) {
+    robotController->ToggleUSTurn(true);
+    // Check if IR detects lab
+    robotController->Forward(Speed::FULL);
+    robotController->Turn(180);
+    while(robotController->IsPerforming(TURNING_RIGHT));
+    robotController->Forward(Speed::NONE);
+    // Do the same for the other direction.
+    
+    // Else, do... ??
+  }
+  
 
 #elif ALGORITHM == 4 /* Collector mode */
 

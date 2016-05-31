@@ -32,16 +32,16 @@ RobotController::RobotController() {
   this->lastUSTurn = millis();
 	this->usSensorMain.Attach(PIN_TRIGGER_ULTRASOUND, PIN_ECHO_ULTRASOUND);
   this->usSensorAux.Attach(PIN_TRIGGER_ULTRASOUNDAUX, PIN_ECHO_ULTRASOUNDAUX);
-  this->irSensorLeft.Attach(0);
-  this->irSensorRight.Attach(1);
+  this->irSensorLeft.Attach(0, false);
+  this->irSensorRight.Attach(1, false);
   this->servoGrabber.attach(PIN_SERVO_GRABBER);
 
   this->lastMovementUpdate = micros();
+  this->distanceTraveled = 0.0;
   this->turnTarget = 0.0;
   this->state = Action::NONE;
   this->usDistance = DISTANCE_INFINITE;
-  this->usAngle = 0.0;
-  this->usDirection = false;
+  this->usTurnEnabled = false;
 
   // Setup Xbee
   this->xbee = new SoftwareSerial(2,3);
@@ -144,6 +144,10 @@ double RobotController::GetUSDistanceAux() {
   return this->usDistanceAux;
 }
 
+void RobotController::ToggleUSTurn(bool enable) {
+  this->usTurnEnabled = enable;
+}
+
 // Comms
 void RobotController::Communicate(){
   if (Serial.available()) { // If data comes in from serial monitor, send it out to XBee
@@ -167,12 +171,22 @@ void RobotController::removeAction(Action::Action a) {
   this->state = this->state & (~a);
 }
 
+double RobotController::GetTravelDist() {
+  return this->distanceTraveled;
+}
+
+void RobotController::ResetTravelDist() {
+  this->distanceTraveled = 0.0;
+}
+
 // Update movement thread
 void RobotController::UpdateMovement() {
   /*
    * Ultrasonic movement
    */
-  if (millis() - this->lastUSTurn > CALIBRATION_TIME_US_TURN){
+  if(!this->usTurnEnabled) {
+    this->usSensorServo.write(degToMs(0));
+  } else if (millis() - this->lastUSTurn > CALIBRATION_TIME_US_TURN) {
     double newPosition = msToDeg(this->usSensorServo.read()) + 45.0;
     if (newPosition > 90.0){
       newPosition = -90.0;
@@ -209,6 +223,8 @@ void RobotController::UpdateMovement() {
   // When the delta of right is greater than the delta of left, then we must have been turning. We need to calculate the angle and remove it from the target.
   if (dSRight != dSLeft)  {
     this->turnTarget -= (dSLeft / (WHEEL_DISTANCE_APART / 2.0)) * (180.00 / PI);
+  } else {
+    this->distanceTraveled += dSLeft;
   }
 
   double modLeft;

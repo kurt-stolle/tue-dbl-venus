@@ -47,6 +47,8 @@ public:
   void Reverse(int speed);
 	void Turn(double deg);									// Turning (left is negative, right positive)
 	void UpdateMovement();
+  double GetTravelDist();
+  void ResetTravelDist();
 
   void Grab(bool grab);										// Grabbing
 	void Scan();                            // Perform one sweep
@@ -56,6 +58,7 @@ public:
   void USListenAux();
 	double GetUSDistance();									// Retrieves main US sensor data
   double GetUSDistanceAux();
+  void ToggleUSTurn(bool enable);
 
 	bool IsPerforming(Action::Action a);    // Check whether an action is being performed
 private:
@@ -67,8 +70,7 @@ private:
 	volatile int state;                     // The current state of the robot, collection of actions defined above
   unsigned long lastMovementUpdate;
   unsigned long lastUSTurn;
-  volatile float usAngle;
-  volatile bool usDirection;
+  volatile bool usTurnEnabled;
 
 	// Servo wheels
 	Servo wheelLeft;
@@ -89,6 +91,7 @@ private:
 
   // Target
   volatile double turnTarget; // The turning target, set by the Turn function and used to control how far we are turning 
+  volatile double distanceTraveled;
 };
 
 #endif
