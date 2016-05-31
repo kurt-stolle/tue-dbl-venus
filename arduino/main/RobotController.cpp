@@ -141,10 +141,10 @@ double RobotController::GetUSDistanceAux() {
 // Comms
 void RobotController::Communicate(){
   if (Serial.available()) { // If data comes in from serial monitor, send it out to XBee
-    XBee.write(Serial.read());
+    this->xbee.write(Serial.read());
   }
-  if (XBee.available()) { // If data comes in from XBee, send it out to serial monitor
-    Serial.write(XBee.read());
+  if (this->xbee.available()) { // If data comes in from XBee, send it out to serial monitor
+    Serial.write(this->xbee.read());
   }
 }
 
