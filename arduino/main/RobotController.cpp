@@ -40,6 +40,8 @@ RobotController::RobotController() {
   this->turnTarget = 0.0;
   this->state = Action::NONE;
   this->usDistance = DISTANCE_INFINITE;
+  this->usAngle = 0.0;
+  this->usDirection = false;
 
   // Setup Xbee
   this->xbee = SoftwareSerial(2,3);
@@ -166,10 +168,27 @@ void RobotController::UpdateMovement() {
   /*
    * Ultrasonic movement
    */
-  if (millis() - this->lastUSTurn > CALIBRATION_TIME_US_TURN){
+   
+  /*if (millis() - this->lastUSTurn > CALIBRATION_TIME_US_TURN){
     this->usSensorServo.write(degToMs(-msToDeg(this->usSensorServo.read())));
     this->lastUSTurn = millis();
+  }*/
+
+  if(this->usDirection) {
+    this->usAngle += 20.0f;
+  } else {
+    this->usAngle -= 20.0f;
   }
+
+  if(this->usAngle >= 180) {
+    this->usAngle = 180;
+    this->usDirection = !this->usDirection;
+  } else if(this->usAngle <= 0) {
+    this->usAngle = 0;
+    this->usDirection = !this->usDirection;
+  }
+
+  this->usSensorServo.write(degToMs(this->usAngle));
 
   /*
    * Wheel movement

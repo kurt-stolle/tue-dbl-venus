@@ -1,8 +1,16 @@
 #include "Infrared.h"
 #include "Arduino.h"
 
-void Infrared::Attach(pin measurePin) {
+void Infrared::Attach(pin measurePin, bool longRange) {
   this->measurePin = measurePin;
+
+  if(longRange) {
+    this->thresholdWhite = THRESH_LR_WHITE;
+    this->thresholdGray = THRESH_LR_GRAY;
+  } else {
+    this->thresholdWhite = THRESH_WHITE;
+    this->thresholdGray = THRESH_GRAY;
+  }
 }
 
 Infrared::Color Infrared::GetColor() {
@@ -10,13 +18,13 @@ Infrared::Color Infrared::GetColor() {
   
   int measurement = analogRead(this->measurePin);
   
-  if (measurement < GRAY_THOLD) {
-    return Infrared::BLACK;
-  } else if (measurement >= GRAY_THOLD && measurement < WHITE_THOLD) {
-    return Infrared::GRAY;
+  if (measurement < this->thresholdWhite) {
+    return BLACK;
+  } else if (measurement >= this->thresholdGray && measurement < this->thresholdWhite) {
+    return GRAY;
   }
   
-  return Infrared::WHITE;
+  return WHITE;
 }
 
 
