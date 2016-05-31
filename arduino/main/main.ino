@@ -15,7 +15,8 @@
  * Possible algorithms:
  * 1 - Debug mode (testing routine)
  * 2 - Calibration mode (sets the wheels to move at speed 0 without disabling them)
- * 3 - Venus mode (venus exploration routine)
+ * 3 - Scout mode (venus exploration routine)
+ * 4 - Foraging mode (lab collector routine)
  */
 #define ALGORITHM 1
 
@@ -32,7 +33,7 @@ Servo wheelLeft, wheelRight;
 RobotController* robotController;
 ControlThread* driveThread;
 ControlThread* scanThread;
-bool programFinished = false;
+ControlThread* commThread;
 
 // Interrupt functions
 void driveCallback();
@@ -49,23 +50,17 @@ void loop();
  */
 
 void setup() {
-  Serial.begin(9600);
-  
-#if ALGORITHM == 1
-  Serial.println("Starting in DEBUG mode");
-#elif ALGORITHM == 2
+#if ALGORITHM == 2
   wheelLeft.attach(PIN_MOTOR_LEFT);
   wheelRight.attach(PIN_MOTOR_RIGHT);
-  
-  Serial.println("Starting in CALIBRATION mode");
 #endif
-
   // Create an instance for the robot controller
 	robotController = new RobotController();
 
   // Setup threads
 	driveThread = new ControlThread(driveCallback);
 	scanThread = new ControlThread(scanCallback);
+  commThread = new ControlThread(commCallback);
 
   // Attach an interrupt for the ultrasound
 	attachInterrupt(digitalPinToInterrupt(PIN_ECHO_ULTRASOUND), echoCallback, CHANGE);
@@ -89,11 +84,7 @@ void timerCallback() {
 void loop() {
 	/* Executes main algorithm, leaving fast concurrent tasks
 	to the interrupt callbacks */
-  if(programFinished) {
-    Serial.println("Program finished...");
-    return;
-  }
-
+ 
 #if ALGORITHM == 1 /* Debug mode */
 
     robotController->Forward(Speed::FULL);
@@ -107,7 +98,7 @@ void loop() {
     robotController->Grab(true);
     delay(2000);
     robotController->Grab(false);
-    programFinished = true;
+    delay(5000);
 
 #elif ALGORITHM == 2 /* Calibration mode */
 
@@ -116,10 +107,14 @@ void loop() {
 
   delay(100000);
   
-#elif ALGORITHM == 3 /* Venus mode */
+#elif ALGORITHM == 3 /* Scout mode */
 
-  //robotController->Forward(Speed::FULL);
-  
+  robotController->Forward(Speed::FULL);
+
+#elif ALGORITHM == 4 /* Collector mode */
+
+  robotController->Forward(Speed::FULL);
+ 
 #endif
 }
 
@@ -135,6 +130,10 @@ void scanCallback() {
 	on the head of the robot */
 
 	robotController->Scan();
+}
+
+void commCallback() {
+  robotController->Communicate();
 }
 
 void echoCallback() {

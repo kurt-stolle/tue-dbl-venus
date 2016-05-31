@@ -40,6 +40,11 @@ RobotController::RobotController() {
   this->turnTarget = 0.0;
   this->state = Action::NONE;
   this->usDistance = DISTANCE_INFINITE;
+
+  // Setup Xbee
+  this->xbee = SoftwareSerial(2,3);
+  Serial.begin(9600);
+  this->xbee.begin(9600);
 }
 
 /*
@@ -133,6 +138,16 @@ double RobotController::GetUSDistanceAux() {
   return this->usDistanceAux;
 }
 
+// Comms
+void RobotController::Communicate(){
+  if (Serial.available()) { // If data comes in from serial monitor, send it out to XBee
+    XBee.write(Serial.read());
+  }
+  if (XBee.available()) { // If data comes in from XBee, send it out to serial monitor
+    Serial.write(XBee.read());
+  }
+}
+
 // State flag control
 bool RobotController::IsPerforming(Action::Action a) {
 	return (this->state & a);
@@ -148,12 +163,6 @@ void RobotController::removeAction(Action::Action a) {
 
 // Update movement thread
 void RobotController::UpdateMovement() {
-  Serial.print("Infrared Left: "); Serial.println(this->irSensorLeft.GetColor());
-  Serial.print("Infrared Right: "); Serial.println(this->irSensorRight.GetColor());
-
-
-
-  
   /*
    * Ultrasonic movement
    */
@@ -246,10 +255,6 @@ void RobotController::UpdateMovement() {
     
     this->wheelRight.write(degToMs(-rightSpeed));
   }
-
-  //Serial.print(leftSpeed); Serial.print(" : "); Serial.println(rightSpeed);
-  //Serial.print(this->wheelLeft.read()); Serial.print(" : "); Serial.println(this->wheelRight.read());
-  //Serial.println(this->turnTarget);
 }
 
 

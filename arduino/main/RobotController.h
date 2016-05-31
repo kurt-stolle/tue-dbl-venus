@@ -49,6 +49,7 @@ public:
 
   void Grab(bool grab);										// Grabbing
 	void Scan();                            // Perform one sweep
+  void Communicate();                     // Listens and sends
 	void USListen();												// Listens for response to Scan()
   void USListenAux();
 	double GetUSDistance();									// Retrieves main US sensor data
@@ -58,6 +59,8 @@ public:
 private:
 	void addAction(Action::Action a);       // Set a state flag
 	void removeAction(Action::Action a);    // Unset a state flag
+
+  SoftwareSerial* xbee;                   // Wireless communication
  
 	volatile int state;                     // The current state of the robot, collection of actions defined above
   unsigned long lastMovementUpdate;
