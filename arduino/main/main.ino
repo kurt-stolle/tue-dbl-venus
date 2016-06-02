@@ -113,22 +113,32 @@ void loop() {
     robotController->Grab(false);
     delay(5000);
 
-#elif ALGORITHM == 2 /* Calibration mode */
+#elif ALGORITHM == 2 /* Sensor calibration mode */
 
-  wheelLeft.write(1500);
-  wheelRight.write(1500);
+  Serial.print("Ultrasonic Main: "); Serial.println(robotController->GetUSDistance());
+  Serial.print("Ulrasonic Aux: "); Serial.println(robotController->GetUSDistanceAux());
+  //Serial.print("LineSensor Left: "); Serial.println(robotController->GetUSDistanceAux());
+  //Serial.print("LineSensor Right: "); Serial.println(robotController->GetUSDistanceAux());
+  //Serial.print("Long Range IR: "); Serial.println(robotController->GetUSDistanceAux());
+  //Serial.print("Lab Finding IR: "); Serial.println(robotController->GetUSDistanceAux());
 
-  delay(100000);
+  delay(200);
   
 #elif ALGORITHM == 3 /* Scout mode */
 
   if(doing == Procedure::SWEEP) {   
-    // Try to find sample
-    robotController->Forward(Speed::HALF);
+    /*
+     * Make a 90 degrees turn to the left and to the right.
+     * If the bottom sensor detects something closer than the
+     * top sensor while turning: stop and go to the find
+     * sample procedure. Else: try to find a mountain (now
+     * the sensors will detect the same).
+     */
     robotController->ToggleUSTurn(false);
+    robotController->Forward(Speed::HALF);
     robotController->Turn(-90);
     while(robotController->IsPerforming(Action::TURNING_LEFT)) {
-      if((robotController->GetUSDistance() - robotController->GetUSDistanceAux()) > 10.0) {
+      if((robotController->GetUSDistance() - robotController->GetUSDistanceAux()) > 10.0 && robotController->GetUSDistance() < 250.0) { // 3m for inacurracy protection
         robotController->Turn(0);
         robotController->Forward(Speed::NONE);
         doing = Procedure::FINDING_SAMPLE;
@@ -136,9 +146,9 @@ void loop() {
       }
     }
 
-    robotController->Turn(90);
+    robotController->Turn(180);
     while(robotController->IsPerforming(Action::TURNING_RIGHT)) {
-      if((robotController->GetUSDistance() - robotController->GetUSDistanceAux()) > 10.0) {
+      if((robotController->GetUSDistance() - robotController->GetUSDistanceAux()) > 10.0 && robotController->GetUSDistance() < 250.0) {
         robotController->Turn(0);
         robotController->Forward(Speed::NONE);
         doing = Procedure::FINDING_SAMPLE;
@@ -147,19 +157,9 @@ void loop() {
     }
 
     // Try to find mountain
-    robotController->Turn(-90);
+    robotController->Turn(-180);
     while(robotController->IsPerforming(Action::TURNING_LEFT)) {
-      if((robotController->GetUSDistance() - robotController->GetUSDistanceAux()) < 10.0 && robotController->GetUSDistance() < 300.0) {
-        robotController->Turn(0);
-        robotController->Forward(Speed::NONE);
-        doing = Procedure::FINDING_MOUNTAIN;
-        return;
-      }
-    }
-
-    robotController->Turn(90);
-    while(robotController->IsPerforming(Action::TURNING_RIGHT)) {
-      if((robotController->GetUSDistance() - robotController->GetUSDistanceAux()) < 10.0 && robotController->GetUSDistance() < 300.0) {
+      if((robotController->GetUSDistance() - robotController->GetUSDistanceAux()) < 10.0 && robotController->GetUSDistance() < 250.0) {
         robotController->Turn(0);
         robotController->Forward(Speed::NONE);
         doing = Procedure::FINDING_MOUNTAIN;
@@ -171,37 +171,44 @@ void loop() {
     doing = Procedure::FINDING_MOUNTAIN;
     return;
   } else if(doing == Procedure::FINDING_SAMPLE) {
+    robotController->ToggleUSTurn(false);
     robotController->Forward(Speed::FULL);
-    robotController->ToggleUSTurn(true);
-    while() { // Not reached border
+    
+    while() { // Not reached border (line sensors).
       // Avoid obstacles with main US and LR infrared, but recover straight line after that
-      if() {
-        
-      } else if(robotController->GetUSDistanceAux() < 10.0) { // And infrared sees white
+      if(robotController->GetUSDistance() < 25.0) { // else if: LR IR sees cliff
+        break;  
+      } else if(robotController->GetUSDistanceAux() < 15.0) { // And infrared sees white
         robotController->Forward(Speed::HALF);
         while(robotController->GetUSDistanceAux() > 5.0); // And infrared sees white
-        robotController->Grab(true);
         robotController->Forward(Speed::NONE);
+        
+        robotController->Grab(true);
 
         doing = Procedure::RETURNING_LAB;
         return;
       }
     } 
     
-    robotController->Forward(Speed::FULL);
     robotController->Turn(180);
     while(robotController->IsPerforming(TURNING_RIGHT));
     robotController->Forward(Speed::NONE);
-    
+
+    doing = Procedure::FINDING_MOUNTAIN;
     return;     
   } else if(doing == Procedure::FINDING_MOUNTAIN) {
+    robotController->ToggleUSTurn(true);
     robotController->Forward(Speed::FULL);
-    robotController->ToggleUSTurn(false);
+    
     while() { // Not reached border
-      // Avoid obstacles with LR infrared, but recover straight line after that
+      // Avoid cliffs with LR infrared, but recover straight line after that
       if() {
         
-      } else if(robotController->GetUSDistance() < 20.0) { // And infrared sees black: found mountain
+      } else if(robotController->GetUSDistance() < 25.0) {
+        robotController->Turn(robotController->GetUSAngle()); // Turn towards the mountain
+        robotController->ToggleUSTurn(false);
+        while(robotController->IsPerforming(Action::TURNING_LEFT) || robotController->IsPerforming(Action::TURNING_RIGHT));
+        
         bool foundPassage = false;
         short count = 0;
         double distance = 0.0;
@@ -209,11 +216,11 @@ void loop() {
         while(count < 3 && !foundPassage) {
           robotController->Turn(-90);
           while(robotController->IsPerforming(Action::TURNING_LEFT));
-          delay(300);
+          delay(300); // Check for cliffs/boundary?
           robotController->Turn(90);
           while(robotController->IsPerforming(Action::TURNING_RIGHT));
           
-          if(robotController->GetUSDistance() < 20.0) {
+          if(robotController->GetUSDistance() > 25.0) {
             foundPassage = true;
             break;
           }
@@ -223,10 +230,13 @@ void loop() {
 
         if(foundPassage) {
           distance = robotController->GetDistTraveled();
-          // Set US to right
-          while(robotController->GetUSDistance < 20.0);
+          robotController->SetUSAngle(90);
+          while(robotController->GetUSDistance < 25.0);
+          robotController->SetUSAngle(0);
+          
           robotController->Turn(90);
           while(robotController->IsPerforming(Action::TURNING_RIGHT));
+          
           robotController->ResetDistTraveled();
           while(robotController->GetDistTraveled() < distance); // AND no mountains/cliffs
         }
@@ -237,7 +247,6 @@ void loop() {
       }
     } 
 
-    robotController->Forward(Speed::FULL);
     robotController->Turn(180);
     while(robotController->IsPerforming(TURNING_RIGHT));
     robotController->Forward(Speed::NONE);
@@ -245,15 +254,24 @@ void loop() {
     doing = Procedure::SWEEP;
     return;     
   } else if(doing == Procedure::RETURNING_LAB) {
+    // Check if IR detects lab, stop and turn to that position
+    
     robotController->ToggleUSTurn(true);
-    // Check if IR detects lab
+    robotController->Turn(robotController->GetUSAngle()); // Turn towards the lab
+    robotController->ToggleUSTurn(false);
+    while(robotController->IsPerforming(Action::TURNING_LEFT) || robotController->IsPerforming(Action::TURNING_RIGHT)); // check it
+    
     robotController->Forward(Speed::FULL);
     robotController->Turn(180);
     while(robotController->IsPerforming(TURNING_RIGHT));
     robotController->Forward(Speed::NONE);
-    // Do the same for the other direction.
     
-    // Else, do... ??
+    robotController->ToggleUSTurn(true);
+    robotController->Turn(robotController->GetUSAngle()); // Turn towards the lab
+    robotController->ToggleUSTurn(false);
+    while(robotController->IsPerforming(Action::TURNING_LEFT) || robotController->IsPerforming(Action::TURNING_RIGHT)); // check it
+
+    // Drive towards lab while avoiding cliffs & the boundary
   }
   
 

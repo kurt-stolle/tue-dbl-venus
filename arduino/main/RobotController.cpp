@@ -28,7 +28,7 @@ static double msToDeg(double ms){
  */
 RobotController::RobotController() {
 	this->usSensorServo.attach(PIN_SERVO_ULTRASOUND);
-  this->usSensorServo.write(degToMs(90));
+  this->usSensorServo.write(degToMs(0));
   this->lastUSTurn = millis();
 	this->usSensorMain.Attach(PIN_TRIGGER_ULTRASOUND, PIN_ECHO_ULTRASOUND);
   this->usSensorAux.Attach(PIN_TRIGGER_ULTRASOUNDAUX, PIN_ECHO_ULTRASOUNDAUX);
@@ -41,7 +41,9 @@ RobotController::RobotController() {
   this->turnTarget = 0.0;
   this->state = Action::NONE;
   this->usDistance = DISTANCE_INFINITE;
+  this->usDistanceAux = DISTANCE_INFINITE;
   this->usTurnEnabled = false;
+  this->usAngle = 0.0;
 
   // Setup Xbee
   this->xbee = new SoftwareSerial(2,3);
@@ -131,9 +133,12 @@ void RobotController::USListenAux() {
   }
 }
 
-// Get the US distance
 double RobotController::GetUSAngle() {
    return msToDeg(this->usSensorServo.read());
+}
+
+void RobotController:SetUSAngle(double angle) {
+  this->usAngle = angle;
 }
 
 double RobotController::GetUSDistance() {
@@ -185,7 +190,7 @@ void RobotController::UpdateMovement() {
    * Ultrasonic movement
    */
   if(!this->usTurnEnabled) {
-    this->usSensorServo.write(degToMs(0));
+    this->usSensorServo.write(degToMs(this->usAngle));
   } else if (millis() - this->lastUSTurn > CALIBRATION_TIME_US_TURN) {
     double newPosition = msToDeg(this->usSensorServo.read()) + 45.0;
     if (newPosition > 90.0){
@@ -202,7 +207,7 @@ void RobotController::UpdateMovement() {
    */
   int speed;
   if (this->IsPerforming(Action::MOVING_FORWARD) || this->IsPerforming(Action::MOVING_BACKWARD)) {
-    speed = movementSpeed;
+    speed = this->movementSpeed;
   } else {
     speed = Speed::NONE;
   }

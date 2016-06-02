@@ -51,10 +51,11 @@ public:
   void ResetTravelDist();
 
   void Grab(bool grab);										// Grabbing
-	void Scan();                            // Perform one sweep
+	void Scan();                            // Send one US pulse
   void Communicate();                     // Listens and sends
 	void USListen();												// Listens for response to Scan()
-  double GetUSAngle();
+  double GetUSAngle();                    // Get the current angle of the main US sensor
+  void SetUSAngle(double angle);
   void USListenAux();
 	double GetUSDistance();									// Retrieves main US sensor data
   double GetUSDistanceAux();
@@ -71,6 +72,7 @@ private:
   unsigned long lastMovementUpdate;
   unsigned long lastUSTurn;
   volatile bool usTurnEnabled;
+  volatile double usAngle;
 
 	// Servo wheels
 	Servo wheelLeft;
@@ -91,7 +93,7 @@ private:
 
   // Target
   volatile double turnTarget; // The turning target, set by the Turn function and used to control how far we are turning 
-  volatile double distanceTraveled;
+  volatile double distanceTraveled;       // Keeps track of the distance traveled in centimeters.
 };
 
 #endif
