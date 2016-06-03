@@ -1,13 +1,13 @@
 Digital 0 - RX ZigBee module
 Digital 1 - TX ZigBee module
-Digital 2 - not used
-Digital 3 (PWM) - not used
-Digital 4 - not used
-Digital 5 (PWM) - not used
-Digital 6 (PWM) - not used
+Digital 2 - Ultrasonic Top (Echo Pin)
+Digital 3 (PWM) - Ultrasonic Bottom (Echo Pin)
+Digital 4 - Infrared Sample (bottom)
+Digital 5 (PWM) - Infrared Lab (top)
+Digital 6 (PWM) - Ultrasonic Bottom (Trigger Pin)
 Digital 7 - left encoder
 Digital 8 - right encoder
-Digital 9 (PWM) - ultrasound sensor
+Digital 9 (PWM) - Ultrasonic Top (Trigger Pin)
 Digital 10 (PWM) - grabber servo
 Digital 11 (PWM) - ultrasound servo
 Digital 12 - left servo
