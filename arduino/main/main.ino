@@ -14,19 +14,15 @@
 /*
  * Possible algorithms:
  * 1 - Debug mode (testing routine)
- * 2 - Calibration mode (sets the wheels to move at speed 0 without disabling them)
+ * 2 - Calibration mode (prints sensor debug)
  * 3 - Scout mode (venus exploration routine)
  * 4 - Foraging mode (lab collector routine)
  */
-#define ALGORITHM 1
+#define ALGORITHM 3
 
 /*
  * Algorithm specific variables
  */
-#if ALGORITHM == 2
-Servo wheelLeft, wheelRight;
-#endif
-
 #if ALGORITHM == 3
 namespace Procedure {
   enum Procedure {
@@ -34,10 +30,10 @@ namespace Procedure {
     FINDING_SAMPLE,
     FINDING_MOUNTAIN,
     RETURNING_LAB
-  }
+  };
 }
 
-Procedure doing = Procedure::SWEEP;
+Procedure::Procedure doing = Procedure::SWEEP;
 #endif
 
 /*
@@ -52,7 +48,9 @@ ControlThread* commThread;
 void driveCallback();
 void scanCallback();
 void timerCallback();
+void commCallback();
 void echoCallback();
+void echoAuxCallback();
 
 // Arduino functions
 void setup();
@@ -64,17 +62,15 @@ void avoidCliff();
  */
 
 void setup() {
-#if ALGORITHM == 2
-  wheelLeft.attach(PIN_MOTOR_LEFT);
-  wheelRight.attach(PIN_MOTOR_RIGHT);
-#endif
+  Serial.begin(9600);
+
   // Create an instance for the robot controller
 	robotController = new RobotController();
 
   // Setup threads
 	driveThread = new ControlThread(driveCallback);
 	scanThread = new ControlThread(scanCallback);
-  commThread = new ControlThread(commCallback);
+  //commThread = new ControlThread(commCallback);
 
   // Attach an interrupt for the ultrasound
 	attachInterrupt(digitalPinToInterrupt(PIN_ECHO_ULTRASOUND), echoCallback, CHANGE);
@@ -138,6 +134,7 @@ void loop() {
      * the sensors will detect the same).
      */
     robotController->ToggleUSTurn(false);
+    robotController->SetUSAngle(0);
     robotController->Forward(Speed::HALF);
     robotController->Turn(-90);
     while(robotController->IsPerforming(Action::TURNING_LEFT)) {
@@ -175,6 +172,7 @@ void loop() {
     return;
   } else if(doing == Procedure::FINDING_SAMPLE) {
     robotController->ToggleUSTurn(false);
+    robotController->SetUSAngle(0);
     robotController->Forward(Speed::FULL);
     
     while() { // Not reached border (line sensors see black but LR infrared does not).
@@ -189,7 +187,7 @@ void loop() {
         robotController->Forward(Speed::HALF);
         while(robotController->GetUSDistanceAux() > 5.0); // And LR infrared sees white/black?
         robotController->Forward(Speed::NONE);
-        
+
         robotController->Grab(true);
 
         doing = Procedure::RETURNING_LAB;
@@ -284,7 +282,7 @@ void loop() {
     
     while(count < 10) {
       robotController->ToggleUSTurn(true);
-      if(/* Sensor on top sees lab */) {
+      //if(/* Sensor on top sees lab */) {
         robotController->Forward(Speed::FULL);
         robotController->Turn(robotController->GetUSAngle()); // Turn towards the lab
         robotController->ToggleUSTurn(false);
@@ -293,7 +291,7 @@ void loop() {
 
         foundLab = true;
         break;
-      }
+      //}
       
       
       robotController->Forward(Speed::FULL);
@@ -346,6 +344,6 @@ void echoCallback() {
 void echoAuxCallback() {
   /* Listens to a response from the robot's US sensor
   and sets its distance variable to a new value */
-
-  robotController->USListenAux();
+ 
+ robotController->USListenAux();
 }

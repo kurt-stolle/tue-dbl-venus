@@ -3,28 +3,25 @@
 
 void Infrared::Attach(pin measurePin, bool longRange) {
   this->measurePin = measurePin;
-
-  if(longRange) {
-    this->thresholdWhite = THRESH_LR_WHITE;
-    this->thresholdGray = THRESH_LR_GRAY;
-  } else {
-    this->thresholdWhite = THRESH_WHITE;
-    this->thresholdGray = THRESH_GRAY;
-  }
+  this->longRange = longRange;
 }
 
 Infrared::Color Infrared::GetColor() {
   // Measure pin and return color (Infrared::WHITE, Infrared::GRAY, Infrared::BLACK)
+
+  if(!longRange) {
+    int measurement = analogRead(this->measurePin);
   
-  int measurement = analogRead(this->measurePin);
-  
-  if (measurement < this->thresholdWhite) {
-    return BLACK;
-  } else if (measurement >= this->thresholdGray && measurement < this->thresholdWhite) {
-    return GRAY;
-  }
-  
-  return WHITE;
+    if (measurement < THRESH_GRAY) {
+      return BLACK;
+    } else if (measurement >= THRESH_GRAY && measurement < THRESH_WHITE) {
+      return GRAY;
+    }
+    
+    return WHITE;
+  } else {
+    return digitalRead(this->measurePin) == HIGH ? BLACK : WHITE; 
+  }  
 }
 
 

@@ -88,6 +88,8 @@ private:
   Ultrasonic usSensorAux;
   Infrared irSensorLeft;
   Infrared irSensorRight;
+  Infrared irLab;
+  Infrared irSample;
   volatile double usDistance;
   volatile double usDistanceAux;
 

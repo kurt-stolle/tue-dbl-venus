@@ -24,14 +24,11 @@ class Infrared {
     Color GetColor();           // Returns measured color
   private:
     pin measurePin;
-    int thresholdWhite;
-    int thresholdGray;
+    bool longRange;
 
     enum Threshold {
       THRESH_WHITE = 45,
-      THRESH_GRAY = 15,
-      THRESH_LR_WHITE = 100,
-      THRESH_LR_GRAY = 100     
+      THRESH_GRAY = 15,  
     };
 };
 

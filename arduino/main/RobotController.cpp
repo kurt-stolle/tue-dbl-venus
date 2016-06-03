@@ -32,8 +32,10 @@ RobotController::RobotController() {
   this->lastUSTurn = millis();
 	this->usSensorMain.Attach(PIN_TRIGGER_ULTRASOUND, PIN_ECHO_ULTRASOUND);
   this->usSensorAux.Attach(PIN_TRIGGER_ULTRASOUNDAUX, PIN_ECHO_ULTRASOUNDAUX);
-  this->irSensorLeft.Attach(0, false);
-  this->irSensorRight.Attach(1, false);
+  this->irSensorLeft.Attach(PIN_IR_LEFT, false);
+  this->irSensorRight.Attach(PIN_IR_RIGHT, false);
+  this->irLab.Attach(PIN_IR_LAB, true);
+  this->irSample.Attach(PIN_IR_SAMPLE, true);
   this->servoGrabber.attach(PIN_SERVO_GRABBER);
 
   this->lastMovementUpdate = micros();
@@ -46,9 +48,9 @@ RobotController::RobotController() {
   this->usAngle = 0.0;
 
   // Setup Xbee
-  this->xbee = new SoftwareSerial(2,3);
-  Serial.begin(9600);
-  this->xbee->begin(9600);
+  //this->xbee = new SoftwareSerial(2,3);
+  //Serial.begin(9600); why here
+  //this->xbee->begin(9600);
 }
 
 /*
@@ -137,7 +139,7 @@ double RobotController::GetUSAngle() {
    return msToDeg(this->usSensorServo.read());
 }
 
-void RobotController:SetUSAngle(double angle) {
+void RobotController::SetUSAngle(double angle) {
   this->usAngle = angle;
 }
 
