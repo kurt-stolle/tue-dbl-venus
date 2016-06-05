@@ -4,6 +4,10 @@
 void Infrared::Attach(pin measurePin, bool longRange) {
   this->measurePin = measurePin;
   this->longRange = longRange;
+
+  if(longRange) {
+    pinMode(measurePin, INPUT);
+  }
 }
 
 Infrared::Color Infrared::GetColor() {

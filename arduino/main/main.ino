@@ -18,7 +18,7 @@
  * 3 - Scout mode (venus exploration routine)
  * 4 - Foraging mode (lab collector routine)
  */
-#define ALGORITHM 3
+#define ALGORITHM 2
 
 /*
  * Algorithm specific variables
@@ -112,8 +112,8 @@ void loop() {
 
 #elif ALGORITHM == 2 /* Sensor calibration mode */
 
-  Serial.print("Ultrasonic Main: "); Serial.println(robotController->GetUSDistance());
-  Serial.print("Ulrasonic Aux: "); Serial.println(robotController->GetUSDistanceAux());
+  //Serial.print("Ultrasonic Main: "); Serial.println(robotController->GetUSDistance());
+  //Serial.print("Ulrasonic Aux: "); Serial.println(robotController->GetUSDistanceAux());
   //Serial.print("LineSensor Left: "); Serial.println(robotController->GetUSDistanceAux());
   //Serial.print("LineSensor Right: "); Serial.println(robotController->GetUSDistanceAux());
   //Serial.print("Long Range IR: "); Serial.println(robotController->GetUSDistanceAux());
