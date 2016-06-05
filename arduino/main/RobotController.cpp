@@ -191,10 +191,7 @@ void RobotController::UpdateMovement() {
   /*
    * Ultrasonic movement
    */
-  //Serial.print("IRLAB: "); Serial.println(this->irLab.GetColor());
-  Serial.print("IRSAMPLE: "); Serial.println(this->irSample.GetColor());
-
-   
+    
   if(!this->usTurnEnabled) {
     this->usSensorServo.write(degToMs(this->usAngle));
   } else if (millis() - this->lastUSTurn > CALIBRATION_TIME_US_TURN) {
