@@ -8,7 +8,7 @@
 #define SERVO_MIN 750
 #define SERVO_MAX 2250
 
-static double degToMs(double deg){
+inline double degToMs(double deg){
   // Thank you, Google.
   if (deg < -90) deg = -90;
   if (deg > 90) deg = 90;
@@ -16,7 +16,7 @@ static double degToMs(double deg){
   return map(deg, -90, 90, SERVO_MIN, SERVO_MAX);
 }
 
-static double msToDeg(double ms){
+inline double msToDeg(double ms){
   if (ms < SERVO_MIN) ms = SERVO_MIN;
   if (ms > SERVO_MAX) ms = SERVO_MAX;
 
