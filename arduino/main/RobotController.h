@@ -61,6 +61,11 @@ public:
   double GetUSDistanceAux();
   void ToggleUSTurn(bool enable);
 
+  Infrared::Color GetIRLeft();
+  Infrared::Color GetIRRight();
+  Infrared::Color GetIRSample();
+  Infrared::Color GetIRLab();
+
 	bool IsPerforming(Action::Action a);    // Check whether an action is being performed
 private:
 	void addAction(Action::Action a);       // Set a state flag

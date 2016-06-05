@@ -155,6 +155,22 @@ void RobotController::ToggleUSTurn(bool enable) {
   this->usTurnEnabled = enable;
 }
 
+Infrared::Color RobotController::GetIRLeft() {
+  return this->irSensorLeft.GetColor();  
+}
+
+Infrared::Color RobotController::GetIRRight() {
+  return this->irSensorRight.GetColor();
+}
+
+Infrared::Color RobotController::GetIRSample() {
+  return this->irSample.GetColor();
+}
+
+Infrared::Color RobotController::GetIRLab() {
+  return this->irLab.GetColor();
+}
+
 // Comms
 void RobotController::Communicate(){
   if (Serial.available()) { // If data comes in from serial monitor, send it out to XBee
