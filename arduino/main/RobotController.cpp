@@ -173,12 +173,14 @@ Infrared::Color RobotController::GetIRLab() {
 
 // Comms
 void RobotController::Communicate(){
-  if (Serial.available()) { // If data comes in from serial monitor, send it out to XBee
+  // Probably breaks bottom US sensor.
+  
+  /*if (Serial.available()) { // If data comes in from serial monitor, send it out to XBee
     this->xbee->write(Serial.read());
   }
   if (this->xbee->available()) { // If data comes in from XBee, send it out to serial monitor
     Serial.write(this->xbee->read());
-  }
+  }*/
 }
 
 // State flag control

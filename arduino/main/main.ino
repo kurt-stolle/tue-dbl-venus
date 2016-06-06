@@ -6,11 +6,11 @@
 
  /*
   * Possible algorithms:
-  * - CalibrationAlgorithm
-  * - ScoutAlgorithm
-  * - CollectorAlgorithm
+  * 1 - CalibrationAlgorithm
+  * 2 - ScoutAlgorithm
+  * 3 - CollectorAlgorithm
   */
- #define ALGORITHM ScoutAlgorithm
+ #define ALGORITHM 2
 
  /*
   * Includes
@@ -23,12 +23,15 @@
 #include "TimerOne.h"
 #include "Infrared.h"
 
-#if ALGORITHM == CalibrationAlgorithm
+#if ALGORITHM == 1
   #include "CalibrationAlgorithm.h"
-#elif ALGORITHM == ScoutAlgorithm
+  #define ALGORITHM CalibrationAlgorithm
+#elif ALGORITHM == 2
   #include "ScoutAlgorithm.h"
-#elif ALGORITHM == CollectorAlgorithm
+  #define ALGORITHM ScoutAlgorithm
+#elif ALGORITHM == 3
   #include "CollectorAlgorithm.h"
+  #define ALGORITHM CollectorAlgorithm
 #endif
 
 /*
@@ -50,7 +53,6 @@ void echoAuxCallback();
 // Arduino functions
 void setup();
 void loop();
-bool avoid();
 
 // Algorithm
 ALGORITHM * alg;
@@ -94,9 +96,7 @@ void timerCallback() {
  */
 
 void loop() {
-  if(*alg){
-    alg->loop(robotController);
-  }
+  alg->loop(robotController);
 }
 
 void driveCallback() {
@@ -128,5 +128,5 @@ void echoAuxCallback() {
   /* Listens to a response from the robot's US sensor
   and sets its distance variable to a new value */
 
- robotController->USListenAux();
+  robotController->USListenAux();
 }

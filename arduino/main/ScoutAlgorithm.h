@@ -1,11 +1,11 @@
-#ifdef ScoutAlgorithm_h
+#ifndef ScoutAlgorithm_h
 #define ScoutAlgorithm_h
 
 /*
 
-ALGORITHM DESCRIPTION:
+  ALGORITHM DESCRIPTION:
 
-This algo will make the robot scout for samples to pick up and bring to the lab
+  This algo will make the robot scout for samples to pick up and bring to the lab
 
 */
 
@@ -13,18 +13,20 @@ This algo will make the robot scout for samples to pick up and bring to the lab
 #include "RobotController.h"
 
 namespace Scout {
-  enum Procedure {
-    SWEEPING,
-    RETURNING_LAB
-  }
-}
+enum Procedure {
+  SWEEP,
+  FINDING_SAMPLE,
+  FINDING_MOUNTAIN,
+  RETURNING_LAB
+};
+};
 
 class ScoutAlgorithm : public Algorithm<Scout::Procedure> {
-public:
-  void setup(RobotController* c); // Setup function
-  void loop(RobotController* c); // Loop function
-private:
-  void avoid(RobotController* c);
-}
+  public:
+    void setup(RobotController* c); // Setup function
+    void loop(RobotController* c); // Loop function
+  private:
+    bool avoid(RobotController* c);
+};
 
 #endif

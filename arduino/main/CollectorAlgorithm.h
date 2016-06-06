@@ -1,11 +1,11 @@
-#ifdef CollectorAlgorithm_h
+#ifndef CollectorAlgorithm_h
 #define CollectorAlgorithm_h
 
 /*
 
-ALGORITHM DESCRIPTION:
+  ALGORITHM DESCRIPTION:
 
-This algo will make the robot collect samples dropped by a scout robot
+  This algo will make the robot collect samples dropped by a scout robot
 
 */
 
@@ -13,16 +13,16 @@ This algo will make the robot collect samples dropped by a scout robot
 #include "RobotController.h"
 
 namespace Collector {
-  enum Procedure {
-    SWEEPING,
-    RETURNING_LAB
-  }
-}
+enum Procedure {
+  SWEEPING,
+  RETURNING_LAB
+};
+};
 
 class CollectorAlgorithm : public Algorithm<Collector::Procedure> {
-public:
-  void setup(); // Setup function
-  void loop(); // Loop function
-}
+  public:
+    void setup(RobotController* c) {}; // Setup function
+    void loop(RobotController* c) {}; // Loop function
+};
 
 #endif
