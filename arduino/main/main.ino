@@ -78,8 +78,8 @@ void setup() {
   Timer1.attachInterrupt(timerCallback);
 
   // Setup algo
-  alg = new ALGORITHM (robotController);
-  alg->setup();
+  alg = new ALGORITHM ();
+  alg->setup(robotController);
 }
 
 void timerCallback() {
@@ -95,7 +95,7 @@ void timerCallback() {
 
 void loop() {
   if(*alg){
-    alg->loop();
+    alg->loop(robotController);
   }
 }
 
