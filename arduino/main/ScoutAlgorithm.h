@@ -10,6 +10,7 @@ This algo will make the robot scout for samples to pick up and bring to the lab
 */
 
 #include "Algorithm.h"
+#include "RobotController.h"
 
 namespace Scout {
   enum Procedure {
@@ -20,9 +21,10 @@ namespace Scout {
 
 class ScoutAlgorithm : public Algorithm<Scout::Procedure> {
 public:
-  using Algorithm<Scout::Procedure>::Algorithm;
-  void setup(); // Setup function
-  void loop(); // Loop function
+  void setup(RobotController* c); // Setup function
+  void loop(RobotController* c); // Loop function
+private:
+  void avoid(RobotController* c);
 }
 
 #endif
