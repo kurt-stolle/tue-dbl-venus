@@ -15,14 +15,16 @@
 namespace Collector {
 enum Procedure {
   SWEEPING,
+  AVOIDING_MOUNTAIN,
+  AVOIDING_CLIFF,
   RETURNING_LAB
 };
 };
 
 class CollectorAlgorithm : public Algorithm<Collector::Procedure> {
   public:
-    void setup(RobotController* c) {}; // Setup function
-    void loop(RobotController* c) {}; // Loop function
+    void setup(RobotController* c); // Setup function
+    void loop(RobotController* c); // Loop function
 };
 
 #endif

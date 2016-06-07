@@ -83,9 +83,11 @@ void RobotController::Reverse(int speed) {
 // Turning
 void RobotController::Turn(double deg) {
   if(deg > 0.0) {
+    this->addAction(Action::TURNING);
     this->addAction(Action::TURNING_RIGHT);
     this->removeAction(Action::TURNING_LEFT);
-  } else {
+  } else if (deg < 0.0) {
+    this->addAction(Action::TURNING);
     this->addAction(Action::TURNING_LEFT);
     this->removeAction(Action::TURNING_RIGHT);
   }
@@ -140,7 +142,7 @@ double RobotController::GetUSAngle() {
 }
 
 void RobotController::SetUSAngle(double angle) {
-  this->usAngle = angle;
+  this->usAngle = -1 * angle;
 }
 
 double RobotController::GetUSDistance() {
@@ -279,6 +281,7 @@ void RobotController::UpdateMovement() {
     }
   } else {
     // Do not turn - no modulation needed
+    this->removeAction(Action::TURNING);
     this->removeAction(Action::TURNING_LEFT);
     this->removeAction(Action::TURNING_RIGHT);
 

@@ -25,6 +25,7 @@ namespace Action {
   	GRABBING = 16,
   	SCANNING = 32,
     SCANNINGAUX = 64,
+    TURNING = 128
   };
 };
 
