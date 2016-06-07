@@ -9,9 +9,6 @@
 
 #include "Layout.h"
 
-#define GRAY_THOLD 15
-#define WHITE_THOLD 45
-
 class Infrared {
   public:
     enum Color {
@@ -27,8 +24,8 @@ class Infrared {
     bool longRange;
 
     enum Threshold {
-      THRESH_WHITE = 45,
-      THRESH_GRAY = 15,  
+      THRESH_WHITE = 150,
+      THRESH_GRAY = 300,  
     };
 };
 

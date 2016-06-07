@@ -4,19 +4,28 @@
 #include "RobotController.h"
 
 void ScoutAlgorithm::setup(RobotController* c) {
-  this->setProcedure(Scout::SWEEP);
+  this->setProcedure(Scout::FINDING_SAMPLE);
 }
 
 void ScoutAlgorithm::loop(RobotController* c) {
 
+  Serial.print("Procedure: ");
+
   if (this->getProcedure() == Scout::SWEEP) {
-    c->ToggleUSTurn(false);
+    Serial.println("Sweep"); delay(10000);
+    
+    /*c->ToggleUSTurn(false);
     c->SetUSAngle(0);
-    c->Forward(Speed::HALF);
+    c->Forward(Speed::QUARTER);
+
+    Serial.println("trying sample");
 
     c->Turn(-90);
-    while (c->IsPerforming(Action::TURNING_LEFT)) {
-      if ((c->GetUSDistance() - c->GetUSDistanceAux()) > 10.0 && c->GetUSDistance() < 250.0) { // 3m for inacurracy protection
+    while (c->IsPerforming(Action::TURNING_LEFT)) {            
+      if ((c->GetUSDistance() - c->GetUSDistanceAux()) > 6.0 && c->GetUSDistance() < 250.0) { // 3m for inacurracy protection
+        Serial.print("Main: "); Serial.println(c->GetUSDistance());
+        Serial.print("Aux: "); Serial.println(c->GetUSDistanceAux());
+        
         c->Turn(0);
         c->Forward(Speed::NONE);
         this->setProcedure(Scout::FINDING_SAMPLE);
@@ -24,20 +33,24 @@ void ScoutAlgorithm::loop(RobotController* c) {
       }
     }
 
+    Serial.println("trying sample once more");
+
     c->Turn(180);
-    while (c->IsPerforming(Action::TURNING_RIGHT)) {
-      if ((c->GetUSDistance() - c->GetUSDistanceAux()) > 10.0 && c->GetUSDistance() < 250.0) {
+    while (c->IsPerforming(Action::TURNING_RIGHT)) {      
+      if ((c->GetUSDistance() - c->GetUSDistanceAux()) > 6.0 && c->GetUSDistance() < 250.0) { // 3m for inacurracy protection
         c->Turn(0);
         c->Forward(Speed::NONE);
         this->setProcedure(Scout::FINDING_SAMPLE);
         return;
       }
     }
+
+    Serial.println("trying mountain");
 
     // Try to find mountain
     c->Turn(-180);
-    while (c->IsPerforming(Action::TURNING_LEFT)) {
-      if ((c->GetUSDistance() - c->GetUSDistanceAux()) < 10.0 && c->GetUSDistance() < 250.0) {
+    while (c->IsPerforming(Action::TURNING_LEFT)) {      
+      if ((c->GetUSDistance() - c->GetUSDistanceAux()) < 6.0 && c->GetUSDistance() < 250.0) {
         c->Turn(0);
         c->Forward(Speed::NONE);
         this->setProcedure(Scout::FINDING_MOUNTAIN);
@@ -47,8 +60,10 @@ void ScoutAlgorithm::loop(RobotController* c) {
 
     c->Forward(Speed::NONE);
     this->setProcedure(Scout::FINDING_MOUNTAIN);
-    return;
+    return;*/
   } else if (this->getProcedure() == Scout::FINDING_SAMPLE) {
+    Serial.println("Sample");
+
     c->ToggleUSTurn(false);
     c->SetUSAngle(0);
     c->Forward(Speed::FULL);
@@ -58,33 +73,29 @@ void ScoutAlgorithm::loop(RobotController* c) {
     while (!reachedBorder) { // Not reached border
       if (c->GetUSDistance() < 25.0) {
         // We encountered a mountain, go look behind it.
+        Serial.println("Detected mountain");
         c->Forward(Speed::NONE);
         this->setProcedure(Scout::FINDING_MOUNTAIN);
         return;
       } else if (c->GetIRLeft() == Infrared::BLACK || c->GetIRRight() == Infrared::BLACK) {
+        Serial.println("black shit");
+        
         if (!this->avoid(c)) {
+          Serial.println("Reached border");
           reachedBorder = true;
         }
-      } else if (c->GetUSDistanceAux() < 15.0) {
+      } else if (c->GetUSDistanceAux() < 20.0 && c->GetUSDistanceAux() > 15.0) {
+        Serial.println("Detected sample");
+
+        unsigned long startDriveTime = millis();
+        
         c->Forward(Speed::HALF);
-        while (c->GetUSDistanceAux() > 8.0);
+        while (c->GetUSDistanceAux() > 6.0 && (millis() - startDriveTime) < 3000);
         c->Forward(Speed::NONE);
 
         c->Grab(true); // IR sample detection
-        delay(300);
 
-        c->Forward(Speed::HALF);
-        if (c->GetIRSample() == Infrared::WHITE) {
-          c->Grab(false);
-          delay(500);
-          c->Grab(true);
-
-          this->setProcedure(Scout::RETURNING_LAB);
-        } else {
-          c->Grab(false);
-          this->setProcedure(Scout::SWEEP);
-        }
-
+        this->setProcedure(Scout::RETURNING_LAB);
         c->Forward(Speed::NONE);
         return;
       }
@@ -97,7 +108,9 @@ void ScoutAlgorithm::loop(RobotController* c) {
     this->setProcedure(Scout::FINDING_MOUNTAIN);
     return;
   } else if (this->getProcedure() == Scout::FINDING_MOUNTAIN) {
-    c->ToggleUSTurn(true);
+    Serial.println("Mountain"); delay(10000);
+    
+    /*c->ToggleUSTurn(true);
     c->Forward(Speed::FULL);
 
     bool reachedBorder = false;
@@ -218,9 +231,11 @@ void ScoutAlgorithm::loop(RobotController* c) {
     c->Forward(Speed::NONE);
 
     this->setProcedure(Scout::SWEEP);
-    return;
+    return;*/
   } else if (this->getProcedure() == Scout::RETURNING_LAB) {
-    c->ToggleUSTurn(true);
+    Serial.println("Sweep"); delay(10000);
+    
+    /*c->ToggleUSTurn(true);
 
     short count = 0;
     bool foundLab = false;
@@ -255,6 +270,6 @@ void ScoutAlgorithm::loop(RobotController* c) {
     }
 
     c->Forward(Speed::NONE);
-    this->setProcedure(Scout::SWEEP);
+    this->setProcedure(Scout::SWEEP);*/
   }
 }

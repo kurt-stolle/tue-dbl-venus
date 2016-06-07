@@ -95,7 +95,7 @@ void RobotController::Turn(double deg) {
 
 // Grab an object
 void RobotController::Grab(bool grab) {
-	this->servoGrabber.write(grab ? degToMs(90) : degToMs(0));
+	this->servoGrabber.write(grab ? degToMs(-50) : degToMs(0));
 }
 
 // Scan using the US sensor
@@ -209,6 +209,12 @@ void RobotController::UpdateMovement() {
   /*
    * Ultrasonic movement
    */
+
+  //Serial.print("Main: "); Serial.println(this->GetUSDistance());
+  //Serial.print("Aux: "); Serial.println(this->GetUSDistanceAux());
+
+  //Serial.print("IR Left: "); Serial.println(this->GetIRLeft());
+  //Serial.print("IR Right: "); Serial.println(this->GetIRRight());
     
   if(!this->usTurnEnabled) {
     this->usSensorServo.write(degToMs(this->usAngle));

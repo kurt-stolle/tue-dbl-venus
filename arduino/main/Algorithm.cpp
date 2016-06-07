@@ -15,7 +15,7 @@ template <class Procedure> Procedure Algorithm<Procedure>::getProcedure() {
 }
 
 template <class Procedure> bool Algorithm<Procedure>::avoid(RobotController* c) {
-  bool left = (c->GetIRLeft() == Infrared::BLACK);
+  bool left = !(c->GetIRLeft() == Infrared::BLACK);
   short count = 0;
   double distance = 0.0;
   bool foundPassage = false;

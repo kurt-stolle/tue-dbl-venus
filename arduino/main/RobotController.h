@@ -32,8 +32,10 @@ namespace Action {
 namespace Speed {
 	enum Speed {
 		NONE = 0,
+    QUARTER = 20,
 		HALF = 45,
 		FULL = 90,
+    QUARTER_REVERSE = -20,
     HALF_REVERSE = -45,
     FULL_REVERSE = -90
 	};
