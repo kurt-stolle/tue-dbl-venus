@@ -8,6 +8,7 @@ template <class Procedure> class Algorithm {
 protected:
   void setProcedure(Procedure p);           // Set the current procedure
   Procedure getProcedure();                 // Get the current procedure
+  bool avoid(RobotController* c);
 public:
   virtual void loop(RobotController* c);    // Must be overriden
   virtual void setup(RobotController* c);   // Ditto.

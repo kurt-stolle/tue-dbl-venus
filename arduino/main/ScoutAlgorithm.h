@@ -26,7 +26,6 @@ class ScoutAlgorithm : public Algorithm<Scout::Procedure> {
     void setup(RobotController* c); // Setup function
     void loop(RobotController* c); // Loop function
   private:
-    bool avoid(RobotController* c);
 };
 
 #endif
