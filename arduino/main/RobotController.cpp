@@ -47,6 +47,9 @@ RobotController::RobotController() {
   this->usTurnEnabled = false;
   this->usAngle = 0.0;
 
+  pinMode(PIN_LEFT_ENCODER, INPUT);
+  pinMode(PIN_RIGHT_ENCODER, INPUT);
+
   // Setup Xbee
   //this->xbee = new SoftwareSerial(2,3);
   //Serial.begin(9600); why here
@@ -158,7 +161,7 @@ void RobotController::ToggleUSTurn(bool enable) {
 }
 
 Infrared::Color RobotController::GetIRLeft() {
-  return this->irSensorLeft.GetColor();  
+  return this->irSensorLeft.GetColor();
 }
 
 Infrared::Color RobotController::GetIRRight() {
@@ -176,7 +179,7 @@ Infrared::Color RobotController::GetIRLab() {
 // Comms
 void RobotController::Communicate(){
   // Probably breaks bottom US sensor.
-  
+
   /*if (Serial.available()) { // If data comes in from serial monitor, send it out to XBee
     this->xbee->write(Serial.read());
   }
@@ -209,9 +212,54 @@ void RobotController::ResetTravelDist() {
 // Update movement thread
 void RobotController::UpdateMovement() {
   /*
+   * RPM calculations
+   */
+   for (char i = 0; i < 2; i++){
+      // Fuck repeating code for L and R
+     double* rpm;
+     double* edge;
+     int* last;
+     double* arr;
+     int val;
+
+     switch(i){
+      case 0:
+        rpm = &this->leftRPM;
+        edge = &this->leftRPMLastEncoderEdge;
+        last = &this->leftRPMLastEncoderValue;
+        arr = this->leftRPMRunningAverage;
+        val = digitalRead(PIN_LEFT_ENCODER);
+      case 1:
+        rpm = &this->rightRPM;
+        edge = &this->rightRPMLastEncoderEdge;
+        last = &this->rightRPMLastEncoderValue;
+        arr = this->rightRPMRunningAverage;
+        val = digitalRead(PIN_RIGHT_ENCODER);
+     }
+
+      // Calculations
+     if (val != *last) {
+      if (val == HIGH and *last == LOW){ // We're at a rising edge
+        for (char a = 0; a < WHEEL_AVERAGE-1; a++){
+          arr[a] = arr[a+1] ? arr[a+1] : 0.0;
+        }
+        arr[WHEEL_AVERAGE-1] = ((60000.0)/((millis() - this->rightRPMLastEncoderEdge) * CALIBRATION_WHEEL_HOLES));
+        
+        double avg;
+        for (char a = 0; a < WHEEL_AVERAGE; a++){
+          avg += arr[a];
+        }
+        *rpm = avg / WHEEL_AVERAGE;
+        *edge = millis();
+      }
+       *last = val;
+     }
+   }
+
+  /*
    * Ultrasonic movement
    */
-    
+
   if(!this->usTurnEnabled) {
     this->usSensorServo.write(degToMs(this->usAngle));
   } else if (millis() - this->lastUSTurn > CALIBRATION_TIME_US_TURN) {
@@ -242,10 +290,8 @@ void RobotController::UpdateMovement() {
     unsigned long dT = T - this->lastMovementUpdate; // Time delta in microseconds
     this->lastMovementUpdate = T;
 
-    long double maxRotations = (WHEEL_RPM_FULL * dT / 60000000.); // Rotations if speed would be maximum
-
-    dSRight = (2 * PI * WHEEL_RADIUS) * maxRotations * ( (this->wheelRight.attached() ? -msToDeg(this->wheelRight.read()) : 0.00 ) / Speed::FULL ); // Distance deltas
-    dSLeft  = (2 * PI * WHEEL_RADIUS) * maxRotations * ( (this->wheelLeft.attached() ? msToDeg(this->wheelLeft.read()) : 0.00 ) / Speed::FULL );
+    dSRight = !this->wheelRight.attached() ? 0 : (2 * PI * WHEEL_RADIUS) * (this->rightRPM * dT / 60000000.);
+    dSLeft  = !this->wheelLeft.attached() ? 0 : (2 * PI * WHEEL_RADIUS) * (this->leftRPM * dT / 60000000.);
   }
 
   // When the delta of right is greater than the delta of left, then we must have been turning. We need to calculate the angle and remove it from the target.
