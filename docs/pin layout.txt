@@ -12,8 +12,8 @@ Digital 10 (PWM) - grabber servo
 Digital 11 (PWM) - ultrasound servo
 Digital 12 - left servo
 Digital 13 - right servo
-Analog 0 - not used
-Analog 1 - not used
+Analog 0 - IR Left
+Analog 1 - IR Right
 Analog 2 - not used
 Analog 3 - not used
 Analog 4 - not used
