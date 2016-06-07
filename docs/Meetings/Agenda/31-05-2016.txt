@@ -1,0 +1,23 @@
+Agenda 31 May
+By Tim
+
+- Demo: Kurt
+- Notes: Marius
+
+- Progress last week
+	> Communication
+	> Grabbing
+	> Line detection
+	> Navigation
+- This week
+	> We should do final testing
+	> Main algorithm, any help?
+	> Clearly write down our strategy
+	> Progress of final report?
+	> 
+- Distribution of tasks
+- AOB
+
+REMINDER:
+- Deadline video presentation: 16th June (2 weeks)
+
