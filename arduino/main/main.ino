@@ -25,13 +25,13 @@
 
 #if ALGORITHM == 1
   #include "CalibrationAlgorithm.h"
-  #define ALGORITHM CalibrationAlgorithm
+  #define _ALGORITHM_ CalibrationAlgorithm
 #elif ALGORITHM == 2
   #include "ScoutAlgorithm.h"
-  #define ALGORITHM ScoutAlgorithm
+  #define _ALGORITHM_ ScoutAlgorithm
 #elif ALGORITHM == 3
   #include "CollectorAlgorithm.h"
-  #define ALGORITHM CollectorAlgorithm
+  #define _ALGORITHM_ CollectorAlgorithm
 #endif
 
 /*
@@ -55,7 +55,7 @@ void setup();
 void loop();
 
 // Algorithm
-ALGORITHM * alg;
+_ALGORITHM_ * alg;
 
 /*
  * Setup & Thread control
@@ -80,7 +80,7 @@ void setup() {
   Timer1.attachInterrupt(timerCallback);
 
   // Setup algo
-  alg = new ALGORITHM ();
+  alg = new _ALGORITHM_ ();
   alg->setup(robotController);
 }
 

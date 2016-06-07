@@ -1,3 +1,4 @@
+#include "Algorithm.h"
 #include "ScoutAlgorithm.h"
 #include "Arduino.h"
 #include "RobotController.h"
@@ -59,7 +60,7 @@ void ScoutAlgorithm::loop(RobotController* c) {
     c->ToggleUSTurn(false);
     c->SetUSAngle(0);
     c->Forward(Speed::HALF);
-    
+
     c->Turn(-90);
     while (c->IsPerforming(Action::TURNING_LEFT)) {
       if ((c->GetUSDistance() - c->GetUSDistanceAux()) > 10.0 && c->GetUSDistance() < 250.0) { // 3m for inacurracy protection
@@ -279,7 +280,7 @@ void ScoutAlgorithm::loop(RobotController* c) {
       c->Forward(Speed::NONE);
 
       startSearchTime = millis();
-      
+
       while ((millis() - startSearchTime) < (25 * 1000)) {
         if (c->GetIRLab() == Infrared::WHITE) {
           c->Forward(Speed::FULL);
