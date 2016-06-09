@@ -124,6 +124,7 @@ void ScoutAlgorithm::loop(RobotController* c) {
         c->Forward(Speed::NONE);
         c->Turn(c->GetUSAngle()); // Turn towards the mountain
         c->ToggleUSTurn(false);
+        c->SetUSAngle(0);
         while (c->IsPerforming(Action::TURNING_LEFT) || c->IsPerforming(Action::TURNING_RIGHT));
 
         bool foundPassage = false;
@@ -147,9 +148,9 @@ void ScoutAlgorithm::loop(RobotController* c) {
 
         unsigned long startTime = millis();
 
-        while (count < 3 && (startTime - millis()) < (20 * 1000)) { // Timeout of 20s
+        while (count < 3 && (millis() - startTime) < (20 * 1000)) { // Timeout of 20s
           unsigned long startDriveTime = millis();
-          while ((startDriveTime - millis()) < 500) {
+          while ((millis() - startDriveTime) < 500) {
             if (c->GetIRLeft() == Infrared::BLACK || c->GetIRRight() == Infrared::BLACK) {
               if (!this->avoid(c)) {
                 c->Turn(180);
@@ -233,7 +234,7 @@ void ScoutAlgorithm::loop(RobotController* c) {
     this->setProcedure(Scout::SWEEP);
     return;*/
   } else if (this->getProcedure() == Scout::RETURNING_LAB) {
-    Serial.println("Sweep"); delay(10000);
+    Serial.println("Returning to lab"); delay(10000);
     
     /*c->ToggleUSTurn(true);
 
@@ -265,8 +266,10 @@ void ScoutAlgorithm::loop(RobotController* c) {
       count++;
     }
 
+    bool reachedLab = false;
+
     if (foundLab) {
-      // todo
+      // TODO
     }
 
     c->Forward(Speed::NONE);

@@ -1,9 +1,9 @@
 #include "Algorithm.h"
 
 /*
- * Implementation
- */
- #include "Algorithm.h"
+   Implementation
+*/
+#include "Algorithm.h"
 
 
 template <class Procedure> void Algorithm<Procedure>::setProcedure(Procedure p) {
@@ -28,20 +28,27 @@ template <class Procedure> bool Algorithm<Procedure>::avoid(RobotController* c) 
     c->Turn(left ? -90 : 90);
     while (c->IsPerforming(Action::TURNING_LEFT) || c->IsPerforming(Action::TURNING_RIGHT));
 
+    unsigned long startDriveTime = millis();
+    
     c->ResetTravelDist();
-    delay(500);
+    while((millis() - startDriveTime) < 500) {
+      if(c->GetIRLeft == INFRARED::BLACK || c->GetIRRight() == Infrared::BLACK) {
+        count = 10000; // Can't go further to the left/right
+      }
+    }
     distance += c->GetTravelDist();
 
     c->Turn(left ? 90 : -90); // turn back to look at line/cliff
     while (c->IsPerforming(Action::TURNING_LEFT) || c->IsPerforming(Action::TURNING_RIGHT));
 
-    unsigned long startDriveTime = millis();
+    startDriveTime = millis();
     foundPassage = true;
 
-    while ((startDriveTime - millis()) < 1000) {
+    while ((millis() - startDriveTime) < 1000) {
       if (c->GetIRLeft() == Infrared::BLACK || c->GetIRRight() == Infrared::BLACK) {
         foundPassage = false;
         count++;
+        break;
       }
     }
   }
@@ -52,7 +59,7 @@ template <class Procedure> bool Algorithm<Procedure>::avoid(RobotController* c) 
     while (c->IsPerforming(Action::TURNING_LEFT) || c->IsPerforming(Action::TURNING_RIGHT));
 
     unsigned long startDriveTime = millis();
-    while (c->GetTravelDist() < distance && (millis() - startDriveTime) < (10 * 1000));
+    while (c->GetTravelDist() < distance && (millis() - startDriveTime) < (10 * 1000) && c->GetIRLeft() == INFRARED::WHITE && c->GetIRRight == INFRARED::WHITE);
 
     c->Turn(left ? -90 : 90);
     while (c->IsPerforming(Action::TURNING_LEFT) || c->IsPerforming(Action::TURNING_RIGHT));
@@ -62,13 +69,13 @@ template <class Procedure> bool Algorithm<Procedure>::avoid(RobotController* c) 
 }
 
 /*
- * Define possiblle templates
- */
+   Define possiblle templates
+*/
 
- #include "CalibrationAlgorithm.h"
- #include "ScoutAlgorithm.h"
- #include "CollectorAlgorithm.h"
+#include "CalibrationAlgorithm.h"
+#include "ScoutAlgorithm.h"
+#include "CollectorAlgorithm.h"
 
- template class Algorithm<Scout::Procedure>;
- template class Algorithm<Calibration::Procedure>;
- template class Algorithm<Collector::Procedure>;
+template class Algorithm<Scout::Procedure>;
+template class Algorithm<Calibration::Procedure>;
+template class Algorithm<Collector::Procedure>;
