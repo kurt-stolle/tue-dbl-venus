@@ -22,7 +22,7 @@ void ScoutAlgorithm::loop(RobotController* c) {
 
     c->Turn(-90);
     while (c->IsPerforming(Action::TURNING_LEFT)) {            
-      if ((c->GetUSDistance() - c->GetUSDistanceAux()) > 6.0 && c->GetUSDistance() < 250.0) { // 3m for inacurracy protection
+      if ((c->GetUSDistance() - c->GetUSDistanceAux()) > 6.0 && c->GetUSDistance() < 250.0 && c->GetUSDistanceAux() > 10.0) { // 3m for inacurracy protection
         Serial.print("Main: "); Serial.println(c->GetUSDistance());
         Serial.print("Aux: "); Serial.println(c->GetUSDistanceAux());
         
@@ -37,7 +37,7 @@ void ScoutAlgorithm::loop(RobotController* c) {
 
     c->Turn(180);
     while (c->IsPerforming(Action::TURNING_RIGHT)) {      
-      if ((c->GetUSDistance() - c->GetUSDistanceAux()) > 6.0 && c->GetUSDistance() < 250.0) { // 3m for inacurracy protection
+      if ((c->GetUSDistance() - c->GetUSDistanceAux()) > 6.0 && c->GetUSDistance() < 250.0 && c->GetUSDistanceAux() > 10.0) { // 3m for inacurracy protection
         c->Turn(0);
         c->Forward(Speed::NONE);
         this->setProcedure(Scout::FINDING_SAMPLE);
@@ -62,7 +62,7 @@ void ScoutAlgorithm::loop(RobotController* c) {
     this->setProcedure(Scout::FINDING_MOUNTAIN);
     return;
   } else if (this->getProcedure() == Scout::FINDING_SAMPLE) {
-    Serial.println("Sample");
+    Serial.println("Sample"); delay(10000);
 
     /*c->ToggleUSTurn(false);
     c->SetUSAngle(0);
@@ -84,7 +84,7 @@ void ScoutAlgorithm::loop(RobotController* c) {
           Serial.println("Reached border");
           reachedBorder = true;
         }
-      } else if (c->GetUSDistanceAux() < 20.0 && c->GetUSDistanceAux() > 15.0) {
+      } else if (c->GetUSDistanceAux() < 20.0 && c->GetUSDistanceAux() > 10.0) {
         Serial.println("Detected sample");
 
         unsigned long startDriveTime = millis();

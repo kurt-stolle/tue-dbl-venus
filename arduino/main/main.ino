@@ -10,7 +10,7 @@
   * 2 - ScoutAlgorithm
   * 3 - CollectorAlgorithm
   */
- #define ALGORITHM 1
+ #define ALGORITHM 2
 
  /*
   * Includes
@@ -76,7 +76,7 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(PIN_ECHO_ULTRASOUND), echoCallback, CHANGE);
   attachInterrupt(digitalPinToInterrupt(PIN_ECHO_ULTRASOUNDAUX), echoAuxCallback, CHANGE);
 
-  Timer1.initialize(5 * 1000L);
+  Timer1.initialize(100 * 1000L);
   Timer1.attachInterrupt(timerCallback);
 
   // Setup algo
