@@ -1,10 +1,7 @@
-#include "Algorithm.h"
-
 /*
    Implementation
 */
 #include "Algorithm.h"
-
 
 template <class Procedure> void Algorithm<Procedure>::setProcedure(Procedure p) {
   this->procedure = p;
@@ -32,7 +29,7 @@ template <class Procedure> bool Algorithm<Procedure>::avoid(RobotController* c) 
     
     c->ResetTravelDist();
     while((millis() - startDriveTime) < 500) {
-      if(c->GetIRLeft == INFRARED::BLACK || c->GetIRRight() == Infrared::BLACK) {
+      if(c->GetIRLeft() == Infrared::BLACK || c->GetIRRight() == Infrared::BLACK) {
         count = 10000; // Can't go further to the left/right
       }
     }
@@ -59,7 +56,7 @@ template <class Procedure> bool Algorithm<Procedure>::avoid(RobotController* c) 
     while (c->IsPerforming(Action::TURNING_LEFT) || c->IsPerforming(Action::TURNING_RIGHT));
 
     unsigned long startDriveTime = millis();
-    while (c->GetTravelDist() < distance && (millis() - startDriveTime) < (10 * 1000) && c->GetIRLeft() == INFRARED::WHITE && c->GetIRRight == INFRARED::WHITE);
+    while (c->GetTravelDist() < distance && (millis() - startDriveTime) < (10 * 1000) && c->GetIRLeft() == Infrared::WHITE && c->GetIRRight() == Infrared::WHITE);
 
     c->Turn(left ? -90 : 90);
     while (c->IsPerforming(Action::TURNING_LEFT) || c->IsPerforming(Action::TURNING_RIGHT));

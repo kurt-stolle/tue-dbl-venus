@@ -14,7 +14,7 @@ void ScoutAlgorithm::loop(RobotController* c) {
   if (this->getProcedure() == Scout::SWEEP) {
     Serial.println("Sweep"); delay(10000);
     
-    /*c->ToggleUSTurn(false);
+    c->ToggleUSTurn(false);
     c->SetUSAngle(0);
     c->Forward(Speed::QUARTER);
 
@@ -60,11 +60,11 @@ void ScoutAlgorithm::loop(RobotController* c) {
 
     c->Forward(Speed::NONE);
     this->setProcedure(Scout::FINDING_MOUNTAIN);
-    return;*/
+    return;
   } else if (this->getProcedure() == Scout::FINDING_SAMPLE) {
     Serial.println("Sample");
 
-    c->ToggleUSTurn(false);
+    /*c->ToggleUSTurn(false);
     c->SetUSAngle(0);
     c->Forward(Speed::FULL);
 
@@ -106,7 +106,7 @@ void ScoutAlgorithm::loop(RobotController* c) {
     c->Forward(Speed::NONE);
 
     this->setProcedure(Scout::FINDING_MOUNTAIN);
-    return;
+    return;*/
   } else if (this->getProcedure() == Scout::FINDING_MOUNTAIN) {
     Serial.println("Mountain"); delay(10000);
     

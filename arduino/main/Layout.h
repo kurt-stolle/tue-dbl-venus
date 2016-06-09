@@ -11,6 +11,7 @@
 
 #define WHEEL_RADIUS 2.75 // centimetres
 #define WHEEL_DISTANCE_APART 9 // Distance the wheels are apart in centimetres
+#define WHEEL_RPM_FULL 30
 
 // Digital pins
 #define PIN_SERVO_GRABBER 10
