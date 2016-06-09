@@ -47,6 +47,9 @@ RobotController::RobotController() {
   this->usTurnEnabled = false;
   this->usAngle = 0.0;
 
+  pinMode(PIN_LEFT_ENCODER, INPUT);
+  pinMode(PIN_RIGHT_ENCODER, INPUT);
+
   // Setup Xbee
   //this->xbee = new SoftwareSerial(2,3);
   //Serial.begin(9600); why here
@@ -83,9 +86,11 @@ void RobotController::Reverse(int speed) {
 // Turning
 void RobotController::Turn(double deg) {
   if(deg > 0.0) {
+    this->addAction(Action::TURNING);
     this->addAction(Action::TURNING_RIGHT);
     this->removeAction(Action::TURNING_LEFT);
-  } else {
+  } else if (deg < 0.0) {
+    this->addAction(Action::TURNING);
     this->addAction(Action::TURNING_LEFT);
     this->removeAction(Action::TURNING_RIGHT);
   }
@@ -140,7 +145,7 @@ double RobotController::GetUSAngle() {
 }
 
 void RobotController::SetUSAngle(double angle) {
-  this->usAngle = angle;
+  this->usAngle = -1 * angle;
 }
 
 double RobotController::GetUSDistance() {
@@ -156,7 +161,7 @@ void RobotController::ToggleUSTurn(bool enable) {
 }
 
 Infrared::Color RobotController::GetIRLeft() {
-  return this->irSensorLeft.GetColor();  
+  return this->irSensorLeft.GetColor();
 }
 
 Infrared::Color RobotController::GetIRRight() {
@@ -174,7 +179,7 @@ Infrared::Color RobotController::GetIRLab() {
 // Comms
 void RobotController::Communicate(){
   // Probably breaks bottom US sensor.
-  
+
   /*if (Serial.available()) { // If data comes in from serial monitor, send it out to XBee
     this->xbee->write(Serial.read());
   }
@@ -206,6 +211,51 @@ void RobotController::ResetTravelDist() {
 
 // Update movement thread
 void RobotController::UpdateMovement() {
+  /*
+   * RPM calculations
+   */
+   /*for (char i = 0; i < 2; i++){
+      // Fuck repeating code for L and R
+     double* rpm;
+     double* edge;
+     int* last;
+     double* arr;
+     int val;
+
+     switch(i){
+      case 0:
+        rpm = &this->leftRPM;
+        edge = &this->leftRPMLastEncoderEdge;
+        last = &this->leftRPMLastEncoderValue;
+        arr = this->leftRPMRunningAverage;
+        val = digitalRead(PIN_LEFT_ENCODER);
+      case 1:
+        rpm = &this->rightRPM;
+        edge = &this->rightRPMLastEncoderEdge;
+        last = &this->rightRPMLastEncoderValue;
+        arr = this->rightRPMRunningAverage;
+        val = digitalRead(PIN_RIGHT_ENCODER);
+     }
+
+      // Calculations
+     if (val != *last) {
+      if (val == HIGH and *last == LOW){ // We're at a rising edge
+        for (char a = 0; a < WHEEL_AVERAGE-1; a++){
+          arr[a] = arr[a+1] ? arr[a+1] : 0.0;
+        }
+        arr[WHEEL_AVERAGE-1] = ((60000.0)/((millis() - this->rightRPMLastEncoderEdge) * CALIBRATION_WHEEL_HOLES));
+        
+        double avg;
+        for (char a = 0; a < WHEEL_AVERAGE; a++){
+          avg += arr[a];
+        }
+        *rpm = avg / WHEEL_AVERAGE;
+        *edge = millis();
+      }
+       *last = val;
+     }
+   }*/
+
   /*
    * Ultrasonic movement
    */
@@ -285,6 +335,7 @@ void RobotController::UpdateMovement() {
     }
   } else {
     // Do not turn - no modulation needed
+    this->removeAction(Action::TURNING);
     this->removeAction(Action::TURNING_LEFT);
     this->removeAction(Action::TURNING_RIGHT);
 

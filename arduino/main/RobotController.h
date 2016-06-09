@@ -14,6 +14,8 @@
 
 #define DISTANCE_INFINITE 10000
 
+#define WHEEL_AVERAGE 6 // 6 samples running averager
+
  // Enumerations for state
 namespace Action {
   enum Action {
@@ -25,6 +27,7 @@ namespace Action {
   	GRABBING = 16,
   	SCANNING = 32,
     SCANNINGAUX = 64,
+    TURNING = 128
   };
 };
 
@@ -70,11 +73,25 @@ public:
 
 	bool IsPerforming(Action::Action a);    // Check whether an action is being performed
 private:
+  // RPM Calculations
+  double leftRPM;
+  double rightRPM;
+
+  double leftRPMRunningAverage[WHEEL_AVERAGE] = {0.0};
+  double rightRPMRunningAverage[WHEEL_AVERAGE] = {0.0};
+
+  int leftRPMLastEncoderValue = 0;
+  double leftRPMLastEncoderEdge; // in milliseconds
+
+  int rightRPMLastEncoderValue = 0;
+  double rightRPMLastEncoderEdge; // in milliseconds
+
+  // Actions
 	void addAction(Action::Action a);       // Set a state flag
 	void removeAction(Action::Action a);    // Unset a state flag
 
   SoftwareSerial* xbee;                   // Wireless communication
- 
+
 	volatile int state;                     // The current state of the robot, collection of actions defined above
   unsigned long lastMovementUpdate;
   unsigned long lastUSTurn;
@@ -85,7 +102,7 @@ private:
 	Servo wheelLeft;
 	Servo wheelRight;
   Servo servoGrabber;
-	
+
   // The current movement speed
 	int movementSpeed;
 
@@ -101,7 +118,7 @@ private:
   volatile double usDistanceAux;
 
   // Target
-  volatile double turnTarget; // The turning target, set by the Turn function and used to control how far we are turning 
+  volatile double turnTarget; // The turning target, set by the Turn function and used to control how far we are turning
   volatile double distanceTraveled;       // Keeps track of the distance traveled in centimeters.
 };
 

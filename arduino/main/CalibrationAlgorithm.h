@@ -14,14 +14,14 @@
 
 namespace Calibration {
 enum Procedure {
-  PROC_CALIBRATING
+  CALIBRATING
 };
 };
 
 class CalibrationAlgorithm : public Algorithm<Calibration::Procedure> {
   public:
-    void setup(RobotController* c) {}; // Setup function
-    void loop(RobotController* c) {}; // Loop function
+    void setup(RobotController* c); // Setup function
+    void loop(RobotController* c); // Loop function
 };
 
 #endif

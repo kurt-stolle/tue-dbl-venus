@@ -1,20 +1,20 @@
 /*
-    TU/e Venus OGO
-    Main
-    Arduino Logic
-*/
+ *  TU/e Venus OGO
+ *  Main
+ *  Arduino Logic
+ */
 
-/*
-   Possible algorithms:
-   1 - CalibrationAlgorithm
-   2 - ScoutAlgorithm
-   3 - CollectorAlgorithm
-*/
-#define ALGORITHM 2
+ /*
+  * Possible algorithms:
+  * 1 - CalibrationAlgorithm
+  * 2 - ScoutAlgorithm
+  * 3 - CollectorAlgorithm
+  */
+ #define ALGORITHM 1
 
-/*
-   Includes
-*/
+ /*
+  * Includes
+  */
 
 #include "RobotController.h"
 #include "Layout.h"
@@ -76,7 +76,7 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(PIN_ECHO_ULTRASOUND), echoCallback, CHANGE);
   attachInterrupt(digitalPinToInterrupt(PIN_ECHO_ULTRASOUNDAUX), echoAuxCallback, CHANGE);
 
-  Timer1.initialize(100 * 1000L);
+  Timer1.initialize(5 * 1000L);
   Timer1.attachInterrupt(timerCallback);
 
   // Setup algo
