@@ -23,14 +23,22 @@ template <class Procedure> bool Algorithm<Procedure>::avoid(RobotController* c) 
 
   while (count < 3 && !foundPassage) {
     c->Turn(left ? -90 : 90);
-    while (c->IsPerforming(Action::TURNING_LEFT) || c->IsPerforming(Action::TURNING_RIGHT));
+    while (c->IsPerforming(Action::TURNING_LEFT) || c->IsPerforming(Action::TURNING_RIGHT)) {
+      if(c->GetIRLeft() == Infrared::BLACK || c->GetIRRight() == Infrared::BLACK) {
+        return false;
+      }
+    }
 
     unsigned long startDriveTime = millis();
     
     c->ResetTravelDist();
     while((millis() - startDriveTime) < 500) {
       if(c->GetIRLeft() == Infrared::BLACK || c->GetIRRight() == Infrared::BLACK) {
-        count = 10000; // Can't go further to the left/right
+        count = 10000; // can't go further to the left/right
+        c->Reverse(Speed::FULL);
+        delay(200);
+        c->Forward(Speed::FULL);
+        break;
       }
     }
     distance += c->GetTravelDist();
@@ -38,8 +46,8 @@ template <class Procedure> bool Algorithm<Procedure>::avoid(RobotController* c) 
     c->Turn(left ? 90 : -90); // turn back to look at line/cliff
     while (c->IsPerforming(Action::TURNING_LEFT) || c->IsPerforming(Action::TURNING_RIGHT));
 
-    startDriveTime = millis();
     foundPassage = true;
+    startDriveTime = millis();
 
     while ((millis() - startDriveTime) < 1000) {
       if (c->GetIRLeft() == Infrared::BLACK || c->GetIRRight() == Infrared::BLACK) {

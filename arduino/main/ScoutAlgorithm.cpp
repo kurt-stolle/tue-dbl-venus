@@ -236,7 +236,7 @@ void ScoutAlgorithm::loop(RobotController* c) {
   } else if (this->getProcedure() == Scout::RETURNING_LAB) {
     Serial.println("Returning to lab"); delay(10000);
     
-    /*c->ToggleUSTurn(true);
+    c->ToggleUSTurn(true);
 
     short count = 0;
     bool foundLab = false;
@@ -273,6 +273,7 @@ void ScoutAlgorithm::loop(RobotController* c) {
     }
 
     c->Forward(Speed::NONE);
-    this->setProcedure(Scout::SWEEP);*/
+    this->setProcedure(Scout::SWEEP);
+    return;
   }
 }
