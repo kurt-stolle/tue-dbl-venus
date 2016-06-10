@@ -7,80 +7,96 @@
 #define DISTANCE_CRITICAL 10.0
 #define DISTANCE_INSIGNIFICANT 20.0
 #define TIME_MOVE_15CM 10.0
+#define BLACKSTUFF_LEFT 0
+#define BLACKSTUFF_RIGHT 1
 
 void CollectorAlgorithm::setup(RobotController* c) {
-  switch(this->getProcedure()){
-    case Collector::SWEEPING:
-    
-    break;
-    case iets:
-    
-    break;
-    
-  }
+
   this->setProcedure(Collector::SWEEPING);
-      int sampleInGrabber = 0;
+  this->whichSide = BLACKSTUFF_LEFT;
 }
 
 void CollectorAlgorithm::loop(RobotController* c) {
-  c->ToggleUSTurn(false); // Disable ultrasonic turning
-  c->SetUSAngle(0); // Set the angle to 0
-  c->Forward(Speed::FULL); // Full power ahead
-
-  Serial.println("Moving forward");
-
-  while (c->GetUSDistance() > 10) delay(50); // Wait until the distance becomes less than 10cm
-
-  Serial.println("Mountain!!!!");
-
-  // Stop moving
   c->Forward(Speed::NONE);
 
-  // Look to the left
-  c->SetUSAngle(-90);
-  delay(CALIBRATION_TIME_US_TURN); // Wait for head to turn
-  if (c->GetUSDistance() < DISTANCE_INSIGNIFICANT) {
-    Serial.println("Left not clear.");
-    
-    c->SetUSAngle(90); // Look to the right
-    delay(CALIBRATION_TIME_US_TURN); // Wait for head to turn
-    if (c->GetUSDistance() > DISTANCE_INSIGNIFICANT) {
-      Serial.println("Right clear! Moving right.");
-      c->Forward(Speed::FULL);
-      c->Turn(90);
-      while (c->IsPerforming(Action::TURNING)) delay(50);
+  switch (this->getProcedure()) {
+    case Collector::SWEEPING:
+      c->ToggleUSTurn(false); // Disable ultrasonic turning
+      c->SetUSAngle(0); // Set the angle to 0
+      c->Forward(Speed::FULL); // Full power ahead
 
-      c->Forward(Speed::FULL); //Move to the right
-      delay(TIME_MOVE_15CM);
-      c->Turn(90); // Go back in the next lane
-    } else {
-      Serial.println("We're fucked. Returning.");
-      c->Forward(Speed::FULL);
-      c->Turn(180);
-      while (c->IsPerforming(Action::TURNING)) delay(50);
-    }
-  } else {
-    Serial.println("Left clear. Moving left.");
-    c->Forward(Speed::FULL);
-    c->Turn(-90);
-    while (c->IsPerforming(Action::TURNING)) delay(50); // Wait until we turned
+      Serial.println("Moving forward");
 
-    c->Forward(Speed::FULL); //Move to the left
-    delay(TIME_MOVE_15CM);
-    c->Turn(-90); // Go back in the next lanet
+      if (c->GetUSDistance() < 10) {
+        // Distance of US is less than 10, mountain is detected.
+        Serial.println("Mountain detected bitch");
+
+        this->setProcedure(Collector::AVOIDING_MOUNTAIN);
+        return;
+      }
+      else if (c->GetIRRight() == Infrared::BLACK) {
+        Serial.println("BLACK stuff Right");
+
+        whichSide = BLACKSTUFF_RIGHT;
+
+        this->setProcedure(Collector::AVOIDING_CLIFF);
+        return;
+
+      }
+      else if (c->GetIRLeft() == Infrared::BLACK) {
+        Serial.println("BLACK stuff Left");
+
+        whichSide = BLACKSTUFF_LEFT;
+
+        this->setProcedure(Collector::AVOIDING_CLIFF);
+        return;
+
+      }
+
+      // No mountains, no cliffs, look for sample
+
+      else if ((c->GetUSDistance() - c->GetUSDistanceAux()) > 10.0 && c->GetUSDistanceAux() < 20.0) {
+        //
+        Serial.println("Detected sample");
+
+        this->setProcedure(Collector::GET_SAMPLE);
+        return;
+      }
+
+      break;
+      
+    case Collector::AVOIDING_MOUNTAIN:
+      c->ToggleUSTurn(false);
+
+      break;
+
+    case Collector::AVOIDING_CLIFF:
+
+      break;
+
+    case Collector::GET_SAMPLE:
+/*
+      while (c->GetUSDistanceAux() > 10.0) {
+        //Driving to sample
+        delay(5);
+      }
+
+      unsigned long startDriveTime = millis();
+
+      c->Forward(Speed::QUARTER);
+      while (c->GetUSDistanceAux() > 6.0 && (millis() - startDriveTime) < 3000);
+      c->Forward(Speed::NONE);
+
+      c->Grab(true); // IR sample detection
+
+      this->setProcedure(Collector::RETURNING_LAB);
+      */
+      
+      break;
+
+    case Collector::RETURNING_LAB:
+
+      break;
   }
-  
-  //Detect sample
-  if ((c->GetUSDistance() - c->GetUSDistanceAux()) > 10){
-    while(c->GetUSDistanceAux() > 5){
-      c->Forward(Speed::HALF); //Move to the sample
-    }
-    
-    //Use code of Loek
-    
-    sampleInGrabber = 1;
-  }
-  
-  if (sampleInGrabber == 1) this->setProcedure(Collector::RETURNING_LAB);
 }
 

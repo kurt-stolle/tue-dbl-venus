@@ -26,6 +26,8 @@ class CollectorAlgorithm : public Algorithm<Collector::Procedure> {
   public:
     void setup(RobotController* c); // Setup function
     void loop(RobotController* c); // Loop function
+   private:
+   int whichSide;
 };
 
 #endif

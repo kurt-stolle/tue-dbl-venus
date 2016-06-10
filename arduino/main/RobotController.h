@@ -10,7 +10,7 @@
 #include "ServoTimer2.h"
 #include "Ultrasonic.h"
 #include "Infrared.h"
-#include "SoftwareSerial.h"
+//#include "SoftwareSerial.h"
 
 #define DISTANCE_INFINITE 10000
 
@@ -90,7 +90,7 @@ private:
 	void addAction(Action::Action a);       // Set a state flag
 	void removeAction(Action::Action a);    // Unset a state flag
 
-  SoftwareSerial* xbee;                   // Wireless communication
+//  SoftwareSerial* xbee;                   // Wireless communication
 
 	volatile int state;                     // The current state of the robot, collection of actions defined above
   unsigned long lastMovementUpdate;
