@@ -73,18 +73,18 @@ public:
 
 	bool IsPerforming(Action::Action a);    // Check whether an action is being performed
 private:
-  // RPmS Calculations
-  double leftRPmS;
-  double rightRPmS;
+  // RPM Calculations
+  double leftRPM;
+  double rightRPM;
 
-  double leftRPmSRunningAverage[WHEEL_AVERAGE] = {0.0};
-  double rightRPmSRunningAverage[WHEEL_AVERAGE] = {0.0};
+  double leftRPMRunningAverage[WHEEL_AVERAGE] = {0.0};
+  double rightRPMRunningAverage[WHEEL_AVERAGE] = {0.0};
 
-  uint8_t leftRPmSLastEncoderValue = 0;
-  unsigned long leftRPmSLastEncoderEdge; // in milliseconds
+  uint8_t leftRPMLastEncoderValue;
+  unsigned long leftRPMLastEncoderEdge; // in milliseconds
 
-  uint8_t rightRPmSLastEncoderValue = 0;
-  unsigned long rightRPmSLastEncoderEdge; // in milliseconds
+  uint8_t rightRPMLastEncoderValue;
+  unsigned long rightRPMLastEncoderEdge; // in milliseconds
 
   // Actions
 	void addAction(Action::Action a);       // Set a state flag
