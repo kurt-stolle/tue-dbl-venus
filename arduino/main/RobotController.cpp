@@ -210,62 +210,45 @@ void RobotController::ResetTravelDist() {
 }
 
 // Update movement thread
-void RobotController::UpdateMovement() {
-  /*
-   * RPM calculations
-   */
-   /*for (char i = 0; i < 2; i++){
-      // Fuck repeating code for L and R
-     double* rpm;
-     double* edge;
-     int* last;
-     double* arr;
-     int val;
-
-     switch(i){
-      case 0:
-        rpm = &this->leftRPM;
-        edge = &this->leftRPMLastEncoderEdge;
-        last = &this->leftRPMLastEncoderValue;
-        arr = this->leftRPMRunningAverage;
-        val = digitalRead(PIN_LEFT_ENCODER);
-      case 1:
-        rpm = &this->rightRPM;
-        edge = &this->rightRPMLastEncoderEdge;
-        last = &this->rightRPMLastEncoderValue;
-        arr = this->rightRPMRunningAverage;
-        val = digitalRead(PIN_RIGHT_ENCODER);
-     }
-
-      // Calculations
-     if (val != *last) {
+inline void updateRPmS(double* rpms, unsigned long* edge, uint8_t* last,double* arr, uint8_t val){
+  if (val != *last) {
       if (val == HIGH and *last == LOW){ // We're at a rising edge
         for (char a = 0; a < WHEEL_AVERAGE-1; a++){
           arr[a] = arr[a+1] ? arr[a+1] : 0.0;
         }
-        arr[WHEEL_AVERAGE-1] = ((60000.0)/((millis() - this->rightRPMLastEncoderEdge) * CALIBRATION_WHEEL_HOLES));
+        arr[WHEEL_AVERAGE-1] = ((millis() - *edge) * CALIBRATION_WHEEL_HOLES);
         
         double avg;
         for (char a = 0; a < WHEEL_AVERAGE; a++){
           avg += arr[a];
         }
-        *rpm = avg / WHEEL_AVERAGE;
+        *rpms = avg / WHEEL_AVERAGE;
         *edge = millis();
       }
-       *last = val;
-     }
-   }*/
+    *last = val;
+  }
+}
+
+inline long double wheelDistanceDelta(unsigned long dt, long double rpms, Servo* wheel){
+  return (2 * PI * WHEEL_RADIUS) * rpms * dt; // dt is in millis, rpms is in millis^-1
+}
+
+void RobotController::UpdateMovement() {
+  /*
+   * Time
+   */
+   unsigned long dt = millis() - this->lastMovementUpdate; // Time delta in microseconds
+   this->lastMovementUpdate = millis();
+  
+  /*
+   * RPmS calculations
+   */
+   updateRPmS(&this->leftRPmS,&this->leftRPmSLastEncoderEdge,&this->leftRPmSLastEncoderValue,this->leftRPmSRunningAverage,digitalRead(PIN_LEFT_ENCODER));
+   updateRPmS(&this->rightRPmS,&this->rightRPmSLastEncoderEdge,&this->rightRPmSLastEncoderValue,this->rightRPmSRunningAverage,digitalRead(PIN_RIGHT_ENCODER));
 
   /*
    * Ultrasonic movement
    */
-
-  //Serial.print("Main: "); Serial.println(this->GetUSDistance());
-  //Serial.print("Aux: "); Serial.println(this->GetUSDistanceAux());
-
-  //Serial.print("IR Left: "); Serial.println(this->GetIRLeft());
-  //Serial.print("IR Right: "); Serial.println(this->GetIRRight());
-    
   if(!this->usTurnEnabled) {
     this->usSensorServo.write(degToMs(this->usAngle));
   } else if (millis() - this->lastUSTurn > CALIBRATION_TIME_US_TURN) {
@@ -290,17 +273,8 @@ void RobotController::UpdateMovement() {
   }
 
   // Calculate the delta for how far we have turned (and moved) since last time
-  double dSRight,dSLeft;
-  {
-    unsigned long T = micros();
-    unsigned long dT = T - this->lastMovementUpdate; // Time delta in microseconds
-    this->lastMovementUpdate = T;
-
-    long double maxRotations = (WHEEL_RPM_FULL * dT / 60000000.); // Rotations if speed would be maximum
-
-    dSRight = (2 * PI * WHEEL_RADIUS) * maxRotations * ( (this->wheelRight.attached() ? -msToDeg(this->wheelRight.read()) : 0.00 ) / Speed::FULL ); // Distance deltas
-    dSLeft  = (2 * PI * WHEEL_RADIUS) * maxRotations * ( (this->wheelLeft.attached() ? msToDeg(this->wheelLeft.read()) : 0.00 ) / Speed::FULL );
-  }
+  long double dSRight = wheelDistanceDelta(dt,this->rightRPmS, &this->wheelRight);
+  long double dSLeft = wheelDistanceDelta(dt,this->leftRPmS, &this->wheelLeft);
 
   // When the delta of right is greater than the delta of left, then we must have been turning. We need to calculate the angle and remove it from the target.
   if (dSRight != dSLeft)  {

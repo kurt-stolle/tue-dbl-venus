@@ -14,7 +14,7 @@
 
 #define DISTANCE_INFINITE 10000
 
-#define WHEEL_AVERAGE 6 // 6 samples running averager
+#define WHEEL_AVERAGE 3 // # samples running averager
 
  // Enumerations for state
 namespace Action {
@@ -73,18 +73,18 @@ public:
 
 	bool IsPerforming(Action::Action a);    // Check whether an action is being performed
 private:
-  // RPM Calculations
-  double leftRPM;
-  double rightRPM;
+  // RPmS Calculations
+  double leftRPmS;
+  double rightRPmS;
 
-  double leftRPMRunningAverage[WHEEL_AVERAGE] = {0.0};
-  double rightRPMRunningAverage[WHEEL_AVERAGE] = {0.0};
+  double leftRPmSRunningAverage[WHEEL_AVERAGE] = {0.0};
+  double rightRPmSRunningAverage[WHEEL_AVERAGE] = {0.0};
 
-  int leftRPMLastEncoderValue = 0;
-  double leftRPMLastEncoderEdge; // in milliseconds
+  uint8_t leftRPmSLastEncoderValue = 0;
+  unsigned long leftRPmSLastEncoderEdge; // in milliseconds
 
-  int rightRPMLastEncoderValue = 0;
-  double rightRPMLastEncoderEdge; // in milliseconds
+  uint8_t rightRPmSLastEncoderValue = 0;
+  unsigned long rightRPmSLastEncoderEdge; // in milliseconds
 
   // Actions
 	void addAction(Action::Action a);       // Set a state flag
