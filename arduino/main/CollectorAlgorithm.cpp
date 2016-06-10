@@ -27,7 +27,7 @@ void CollectorAlgorithm::loop(RobotController* c) {
 
       Serial.println("Moving forward");
 
-      if (c->GetUSDistance() < 10) {
+      if (c->GetUSDistance() < DISTANCE_CRITICAL) {
         // Distance of US is less than 10, mountain is detected.
         Serial.println("Mountain detected bitch");
 
@@ -68,10 +68,60 @@ void CollectorAlgorithm::loop(RobotController* c) {
     case Collector::AVOIDING_MOUNTAIN:
       c->ToggleUSTurn(false);
 
+      // Left free?
+      c->SetUSAngle(-90);
+      delay(CALIBRATION_TIME_US_TURN);
+
+      if (c->GetUSDistance() > DISTANCE_INSIGNIFICANT){
+        Serial.println("Left is free");
+        
+        c->Forward(Speed::HALF);
+        c->Turn(-90);
+
+        while(c->IsPerforming(Action::TURNING)) delay(5);
+        
+        this->setProcedure(Collector::SWEEPING);
+
+        Serial.println("Continuing left");
+        
+        return;
+      }
+
+      // Right free?
+      c->SetUSAngle(90);
+      delay(CALIBRATION_TIME_US_TURN);
+
+      if (c->GetUSDistance() > DISTANCE_INSIGNIFICANT) {
+        Serial.println("Right is free, turning but moving slightly right");
+       c->Forward(Speed::HALF);
+       c->Turn(90);
+
+       while(c->IsPerforming(Action::TURNING)) delay(5);
+       
+       c->Forward(Speed::FULL);
+
+       delay(TIME_MOVE_15CM);
+
+       c->Turn(90);
+       while(c->IsPerforming(Action::TURNING)) delay(5);
+
+       this->setProcedure(Collector::SWEEPING);
+
+       Serial.println("Continuing in opposite direction shifted right");
+
+       return;
+      }
+
+      Serial.println("Nothing is free!");
+
+      c->Forward(Speed::FULL_REVERSE);
+      
+      delay(TIME_MOVE_15CM);
+      
       break;
 
     case Collector::AVOIDING_CLIFF:
-
+      this->setProcedure(Collector::SWEEPING);
       break;
 
     case Collector::GET_SAMPLE:

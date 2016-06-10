@@ -10,7 +10,7 @@
   * 2 - ScoutAlgorithm
   * 3 - CollectorAlgorithm
   */
- #define ALGORITHM 2
+ #define ALGORITHM 3
 
  /*
   * Includes
