@@ -64,7 +64,7 @@ void CollectorAlgorithm::loop(RobotController* c) {
       }
 
       break;
-      
+
     case Collector::AVOIDING_MOUNTAIN:
       c->ToggleUSTurn(false);
 
@@ -72,18 +72,21 @@ void CollectorAlgorithm::loop(RobotController* c) {
       c->SetUSAngle(-90);
       delay(CALIBRATION_TIME_US_TURN);
 
-      if (c->GetUSDistance() > DISTANCE_INSIGNIFICANT){
+      if (c->GetUSDistance() > DISTANCE_INSIGNIFICANT) {
         Serial.println("Left is free");
-        
+
         c->Forward(Speed::HALF);
         c->Turn(-90);
 
-        while(c->IsPerforming(Action::TURNING)) delay(5);
-        
+        while (c->IsPerforming(Action::TURNING)) {
+          Serial.println("Turing LEFT");
+          delay(5);
+        }
+
         this->setProcedure(Collector::SWEEPING);
 
         Serial.println("Continuing left");
-        
+
         return;
       }
 
@@ -93,55 +96,99 @@ void CollectorAlgorithm::loop(RobotController* c) {
 
       if (c->GetUSDistance() > DISTANCE_INSIGNIFICANT) {
         Serial.println("Right is free, turning but moving slightly right");
-       c->Forward(Speed::HALF);
-       c->Turn(90);
+        c->Forward(Speed::HALF);
+        c->Turn(90);
 
-       while(c->IsPerforming(Action::TURNING)) delay(5);
-       
-       c->Forward(Speed::FULL);
+        while (c->IsPerforming(Action::TURNING)) {
+          Serial.println("Turing right");
+          delay(5);
+        }
 
-       delay(TIME_MOVE_15CM);
+        c->Forward(Speed::FULL);
 
-       c->Turn(90);
-       while(c->IsPerforming(Action::TURNING)) delay(5);
+        delay(TIME_MOVE_15CM);
 
-       this->setProcedure(Collector::SWEEPING);
+        c->Turn(90);
+        while (c->IsPerforming(Action::TURNING)) delay(5);
 
-       Serial.println("Continuing in opposite direction shifted right");
+        this->setProcedure(Collector::SWEEPING);
 
-       return;
+        Serial.println("Continuing in opposite direction shifted right");
+
+        return;
       }
 
       Serial.println("Nothing is free!");
 
       c->Forward(Speed::FULL_REVERSE);
-      
+
       delay(TIME_MOVE_15CM);
-      
+
       break;
 
     case Collector::AVOIDING_CLIFF:
+
+      if (whichSide == BLACKSTUFF_LEFT) {
+        Serial.println("Right is free, turning but moving slightly right");
+        c->Forward(Speed::HALF);
+        c->Turn(90);
+
+        while (c->IsPerforming(Action::TURNING)) {
+          Serial.println("Turing right");
+          delay(5);
+        }
+
+        c->Forward(Speed::FULL);
+
+        delay(TIME_MOVE_15CM);
+
+        c->Turn(90);
+        while (c->IsPerforming(Action::TURNING)) delay(5);
+
+        this->setProcedure(Collector::SWEEPING);
+
+        Serial.println("Continuing in opposite direction shifted right");
+
+        return;
+      }
+
+      if (whichSide == BLACKSTUFF_RIGHT) {
+
+        Serial.println("Left is free");
+
+        c->Forward(Speed::HALF);
+        c->Turn(-90);
+
+        delay(25);
+
+        this->setProcedure(Collector::SWEEPING);
+
+        Serial.println("Continuing left");
+
+        return;
+
+      }
       this->setProcedure(Collector::SWEEPING);
       break;
 
     case Collector::GET_SAMPLE:
-/*
-      while (c->GetUSDistanceAux() > 10.0) {
-        //Driving to sample
-        delay(5);
-      }
+      /*
+            while (c->GetUSDistanceAux() > 10.0) {
+              //Driving to sample
+              delay(5);
+            }
 
-      unsigned long startDriveTime = millis();
+            unsigned long startDriveTime = millis();
 
-      c->Forward(Speed::QUARTER);
-      while (c->GetUSDistanceAux() > 6.0 && (millis() - startDriveTime) < 3000);
-      c->Forward(Speed::NONE);
+            c->Forward(Speed::QUARTER);
+            while (c->GetUSDistanceAux() > 6.0 && (millis() - startDriveTime) < 3000);
+            c->Forward(Speed::NONE);
 
-      c->Grab(true); // IR sample detection
+            c->Grab(true); // IR sample detection
 
-      this->setProcedure(Collector::RETURNING_LAB);
+            this->setProcedure(Collector::RETURNING_LAB);
       */
-      
+
       break;
 
     case Collector::RETURNING_LAB:
