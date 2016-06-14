@@ -1,0 +1,7 @@
+Task division:
+- Finish component-level design: Tim & Niels
+- Finish sweep-algo description: Tim
+- Add to general algo description: Kurt
+- Finish test & integration: Marius
+- Conclusion: Marius & Loek
+- Discussion: Kurt (software), Niels (electronics)
