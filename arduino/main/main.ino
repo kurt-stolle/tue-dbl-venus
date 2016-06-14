@@ -4,9 +4,9 @@
  *  Arduino Logic
  */
 
- /*
-  * Includes
-  */
+/*
+ * Includes
+ */
 
 #define DEBUG
 
@@ -30,7 +30,7 @@
 
 /*
    General variables
-*/
+ */
 RobotController* robotController;
 ControlThread* driveThread;
 ControlThread* scanThread;
@@ -51,71 +51,71 @@ _ALGORITHM_ * alg;
 
 /*
    Setup & Thread control
-*/
+ */
 
 void setup() {
 #ifdef DEBUG
-  Serial.begin(9600);
+        Serial.begin(9600);
 #endif
 
-  // Create an instance for the robot controller
-  robotController = new RobotController();
+        // Create an instance for the robot controller
+        robotController = new RobotController();
 
-  // Setup threads
-  driveThread = new ControlThread(driveCallback);
-  scanThread = new ControlThread(scanCallback);
+        // Setup threads
+        driveThread = new ControlThread(driveCallback);
+        scanThread = new ControlThread(scanCallback);
 
-  // Attach an interrupt for the ultrasound
-  attachInterrupt(digitalPinToInterrupt(PIN_ECHO_ULTRASOUND), echoCallback, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(PIN_ECHO_ULTRASOUNDAUX), echoAuxCallback, CHANGE);
+        // Attach an interrupt for the ultrasound
+        attachInterrupt(digitalPinToInterrupt(PIN_ECHO_ULTRASOUND), echoCallback, CHANGE);
+        attachInterrupt(digitalPinToInterrupt(PIN_ECHO_ULTRASOUNDAUX), echoAuxCallback, CHANGE);
 
-  Timer1.initialize(25 * 1000L);
-  Timer1.attachInterrupt(timerCallback);
+        Timer1.initialize(25 * 1000L);
+        Timer1.attachInterrupt(timerCallback);
 
-  // Setup algo
-  alg = new _ALGORITHM_ ();
-  alg->setup(robotController);
+        // Setup algo
+        alg = new _ALGORITHM_ ();
+        alg->setup(robotController);
 }
 
 void timerCallback() {
-  /* Calls the threadcontroller to check whether
-    threads in the pool need to be executed at this moment. */
+        /* Calls the threadcontroller to check whether
+           threads in the pool need to be executed at this moment. */
 
-  controlThreadPool.run();
+        controlThreadPool.run();
 }
 
 /*
    Main logic and callback functions
-*/
+ */
 
 void loop() {
-  alg->loop(robotController);
+        alg->loop(robotController);
 }
 
 void driveCallback() {
-  /* Handles all tasks concerning the driving state of
-    the robot (updating servo acceleration etc.) */
+        /* Handles all tasks concerning the driving state of
+           the robot (updating servo acceleration etc.) */
 
-  robotController->UpdateMovement();
+        robotController->UpdateMovement();
 }
 
 void scanCallback() {
-  /* Sends a pulse from the main ultrasonic sensor
-    on the head of the robot */
+        /* Sends a pulse from the main ultrasonic sensor
+           on the head of the robot */
 
-  robotController->Scan();
+        robotController->Scan();
 }
 
 void echoCallback() {
-  /* Listens to a response from the robot's US sensor
-    and sets its distance variable to a new value */
+        /* Listens to a response from the robot's US sensor
+           and sets its distance variable to a new value */
 
-  robotController->USListen();
+        robotController->USListen();
 }
 
 void echoAuxCallback() {
-  /* Listens to a response from the robot's US sensor
-    and sets its distance variable to a new value */
+        /* Listens to a response from the robot's US sensor
+           and sets its distance variable to a new value */
 
-  robotController->USListenAux();
+        robotController->USListenAux();
 }
