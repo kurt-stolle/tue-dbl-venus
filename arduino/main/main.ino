@@ -5,14 +5,6 @@
  */
 
  /*
-  * Possible algorithms:
-  * 1 - CalibrationAlgorithm
-  * 2 - ScoutAlgorithm
-  * 3 - CollectorAlgorithm
-  */
- #define ALGORITHM 1
-
- /*
   * Includes
   */
 
@@ -40,13 +32,11 @@
 RobotController* robotController;
 ControlThread* driveThread;
 ControlThread* scanThread;
-ControlThread* commThread;
 
 // Interrupt functions
 void driveCallback();
 void scanCallback();
 void timerCallback();
-void commCallback();
 void echoCallback();
 void echoAuxCallback();
 
@@ -70,13 +60,12 @@ void setup() {
   // Setup threads
   driveThread = new ControlThread(driveCallback);
   scanThread = new ControlThread(scanCallback);
-  //commThread = new ControlThread(commCallback);
 
   // Attach an interrupt for the ultrasound
   attachInterrupt(digitalPinToInterrupt(PIN_ECHO_ULTRASOUND), echoCallback, CHANGE);
   attachInterrupt(digitalPinToInterrupt(PIN_ECHO_ULTRASOUNDAUX), echoAuxCallback, CHANGE);
 
-  Timer1.initialize(100 * 1000L);
+  Timer1.initialize(50 * 1000L);
   Timer1.attachInterrupt(timerCallback);
 
   // Setup algo
@@ -111,10 +100,6 @@ void scanCallback() {
     on the head of the robot */
 
   robotController->Scan();
-}
-
-void commCallback() {
-  robotController->Communicate();
 }
 
 void echoCallback() {

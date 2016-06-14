@@ -7,6 +7,16 @@
 #ifndef Layout_h
 #define Layout_h
 
+
+ /*
+  * Possible algorithms:
+  * 1 - CalibrationAlgorithm
+  * 2 - ScoutAlgorithm
+  * 3 - CollectorAlgorithm
+  */
+#define ALGORITHM 1
+
+
 #include "ServoTimer2.h"
 
 #define WHEEL_RADIUS 2.75 // centimetres

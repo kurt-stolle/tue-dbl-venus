@@ -76,11 +76,14 @@ template <class Procedure> bool Algorithm<Procedure>::avoid(RobotController* c) 
 /*
    Define possiblle templates
 */
-
+#if ALGORITHM == 1
 #include "CalibrationAlgorithm.h"
-#include "ScoutAlgorithm.h"
-#include "CollectorAlgorithm.h"
-
-template class Algorithm<Scout::Procedure>;
 template class Algorithm<Calibration::Procedure>;
+#elif ALGORITHM == 2
+#include "ScoutAlgorithm.h"
+template class Algorithm<Scout::Procedure>;
+#elif ALGORITHM == 3
+#include "CollectorAlgorithm.h"
 template class Algorithm<Collector::Procedure>;
+#endif
+

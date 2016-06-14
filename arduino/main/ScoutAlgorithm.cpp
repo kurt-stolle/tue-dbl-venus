@@ -276,7 +276,7 @@ void ScoutAlgorithm::loop(RobotController* c) {
       while(c->IsPerforming(Action::TURNING_LEFT) || c->IsPerforming(Action::TURNING_RIGHT));
 
       unsigned long startDriveTime = millis();
-      while((millis() - startDriveTime) < 10000)) {
+      while((millis() - startDriveTime) < 10000) {
         if(c->GetIRLeft() == Infrared::BLACK || c->GetIRRight() == Infrared::BLACK || c->GetUSDistance() < 25.0) {
           c->Forward(Speed::NONE);
           return;

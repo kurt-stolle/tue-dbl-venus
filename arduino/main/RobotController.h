@@ -14,7 +14,7 @@
 
 #define DISTANCE_INFINITE 10000
 
-#define WHEEL_AVERAGE 3 // # samples running averager
+#define WHEEL_AVERAGE 10 // # samples running averager
 
  // Enumerations for state
 namespace Action {
@@ -57,7 +57,6 @@ public:
 
   void Grab(bool grab);										// Grabbing
 	void Scan();                            // Send one US pulse
-  void Communicate();                     // Listens and sends
 	void USListen();												// Listens for response to Scan()
   double GetUSAngle();                    // Get the current angle of the main US sensor
   void SetUSAngle(double angle);
@@ -74,23 +73,14 @@ public:
 	bool IsPerforming(Action::Action a);    // Check whether an action is being performed
 private:
   // RPM Calculations
-  double leftRPM;
-  double rightRPM;
-
-  double leftRPMRunningAverage[WHEEL_AVERAGE] = {0.0};
-  double rightRPMRunningAverage[WHEEL_AVERAGE] = {0.0};
-
-  uint8_t leftRPMLastEncoderValue;
-  unsigned long leftRPMLastEncoderEdge; // in milliseconds
-
-  uint8_t rightRPMLastEncoderValue;
-  unsigned long rightRPMLastEncoderEdge; // in milliseconds
+  double RPM;
+  double RPMRunningAverage[WHEEL_AVERAGE] = {0.0};
+  uint8_t RPMLastEncoderValue;
+  unsigned long RPMLastEncoderEdge; // in milliseconds
 
   // Actions
 	void addAction(Action::Action a);       // Set a state flag
 	void removeAction(Action::Action a);    // Unset a state flag
-
-//  SoftwareSerial* xbee;                   // Wireless communication
 
 	volatile int state;                     // The current state of the robot, collection of actions defined above
   unsigned long lastMovementUpdate;
