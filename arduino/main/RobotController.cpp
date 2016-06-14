@@ -49,13 +49,12 @@ RobotController::RobotController() {
   this->usTurnEnabled = false;
   this->usAngle = 0.0;
 
-  pinMode(PIN_LEFT_ENCODER, INPUT);
   pinMode(PIN_RIGHT_ENCODER, INPUT);
 
   this->RPM = 0;
   this->RPMLastEncoderValue = 0;
   this->RPMLastEncoderEdge = 0.0;
-  for (char a = 0; a < WHEEL_AVERAGE; a--){
+  for (char a = 0; a < WHEEL_AVERAGE; a++){
      this->RPMRunningAverage[a] = 0.0;
    }
 }
@@ -206,21 +205,29 @@ inline void updateRPM(double* rpm, unsigned long* edge, uint8_t* last,double* ar
   if (val != *last) {
       if (val == HIGH and *last == LOW){ // We're at a rising edge
         double rpmCur  = (double) (60000.0/((millis() - *edge) * ((double) CALIBRATION_WHEEL_HOLES)));
-
-        // Significant change in RPM. Do not average.
-        if (arr[WHEEL_AVERAGE-1]-7.0 < rpmCur || rpmCur < arr[WHEEL_AVERAGE-1]+7.0){ 
+       if (rpmCur > arr[WHEEL_AVERAGE-1]+15.0 || rpmCur < arr[WHEEL_AVERAGE-1]-15.0){
+          rpmCur = rpmCur / 2; // Don't allow very rapid changes
+       }
+       if (rpmCur > arr[WHEEL_AVERAGE-1]+5.0 || rpmCur < arr[WHEEL_AVERAGE-1]-5.0){
+          // Significant change in RPM. Do not average.
           for (char a = 0; a < WHEEL_AVERAGE; a++){
             arr[a] = rpmCur;
           }
           *rpm = rpmCur;
-        } else {
-          *rpm = 0.0;
-          arr[WHEEL_AVERAGE-1] = rpmCur;
-          for (char a = 0; a < WHEEL_AVERAGE-1; a++){
-            arr[a] = arr[a+1];
-            *rpm += (arr[a] / WHEEL_AVERAGE);
-          }
           
+        } else {
+          
+          *rpm = 0.0;
+          for (char a = 0; a < WHEEL_AVERAGE; a++){
+            if (a == WHEEL_AVERAGE-1){
+              arr[a] = rpmCur;
+            } else {
+               arr[a] = arr[a+1];
+            }
+         
+            *rpm += (arr[a] / WHEEL_AVERAGE);
+         }
+
         }
         *edge = millis();
       }
@@ -240,18 +247,16 @@ void RobotController::UpdateMovement() {
   /*
    * Time
    */
-
-   
    unsigned long dt = millis() - this->lastMovementUpdate; // Time delta in microseconds
    this->lastMovementUpdate = millis();
 
-   if (dt > 150) return;
-  
+   if (dt > 150) return; // time-out
+
   /*
    * RPM calculations
    */
-   updateRPM(&this->RPM   ,&this->RPMLastEncoderEdge  ,&this->RPMLastEncoderValue    ,this->RPMRunningAverage   ,digitalRead(PIN_LEFT_ENCODER));
-  
+   updateRPM(&this->RPM   ,&this->RPMLastEncoderEdge  ,&this->RPMLastEncoderValue    ,this->RPMRunningAverage   ,digitalRead(PIN_RIGHT_ENCODER));
+
   /*
    * Ultrasonic movement
    */
@@ -278,20 +283,10 @@ void RobotController::UpdateMovement() {
     speed = Speed::NONE;
   }
 
-  
+
 
   // Calculate the delta for how far we have turned (and moved) since last time
-  double dx = wheelDistanceDelta(dt,this->RPM);
-
-  // When the delta of right is greater than the delta of left, then we must have been turning. We need to calculate the angle and remove it from the target.
-  if (this->IsPerforming(Action::TURNING_RIGHT))  {
-    this->turnTarget -= (dx / (WHEEL_DISTANCE_APART / 2.0)) * (180.00 / PI);
-  }  else if (this->IsPerforming(Action::TURNING_LEFT) ) {
-    this->turnTarget += (dx / (WHEEL_DISTANCE_APART / 2.0)) * (180.00 / PI);
-  } else {
-    this->distanceTraveled += dx;
-  }
-
+  double dx = wheelDistanceDelta(dt,this->RPM); 
   double modLeft;
   double modRight;
 
@@ -306,6 +301,7 @@ void RobotController::UpdateMovement() {
       modLeft = 0.25;
       modRight = -0.25;
     }
+    this->turnTarget -= (dx / (WHEEL_DISTANCE_APART / 2.0)) * (180.00 / PI);
   } else if (this->turnTarget < -5.0){
     // Turn right
 
@@ -316,7 +312,10 @@ void RobotController::UpdateMovement() {
       modLeft = -0.25;
       modRight = 0.25;
     }
+    this->turnTarget += (dx / (WHEEL_DISTANCE_APART / 2.0)) * (180.00 / PI);
   } else {
+    this->distanceTraveled += dx;
+    
     // Do not turn - no modulation needed
     this->removeAction(Action::TURNING);
     this->removeAction(Action::TURNING_LEFT);
