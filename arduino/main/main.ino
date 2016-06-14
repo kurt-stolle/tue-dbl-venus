@@ -8,6 +8,8 @@
   * Includes
   */
 
+#define DEBUG
+
 #include "RobotController.h"
 #include "Layout.h"
 #include "ControlThread.h"
@@ -52,7 +54,9 @@ _ALGORITHM_ * alg;
 */
 
 void setup() {
+#ifdef DEBUG
   Serial.begin(9600);
+#endif
 
   // Create an instance for the robot controller
   robotController = new RobotController();

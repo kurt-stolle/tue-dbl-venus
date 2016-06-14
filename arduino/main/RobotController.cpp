@@ -206,15 +206,17 @@ inline void updateRPM(double* rpm, unsigned long* edge, uint8_t* last,double* ar
   if (val != *last) {
       if (val == HIGH and *last == LOW){ // We're at a rising edge
         double rpmCur  = (double) (60000.0/((millis() - *edge) * ((double) CALIBRATION_WHEEL_HOLES)));
-        if (arr[WHEEL_AVERAGE-1]-7.0 < rpmCur || rpmCur < arr[WHEEL_AVERAGE-1]+7.0){ // Significant change in RPM. Do not average.
-          for (char a = 0; a < WHEEL_AVERAGE; a--){
+
+        // Significant change in RPM. Do not average.
+        if (arr[WHEEL_AVERAGE-1]-7.0 < rpmCur || rpmCur < arr[WHEEL_AVERAGE-1]+7.0){ 
+          for (char a = 0; a < WHEEL_AVERAGE; a++){
             arr[a] = rpmCur;
           }
           *rpm = rpmCur;
         } else {
           *rpm = 0.0;
           arr[WHEEL_AVERAGE-1] = rpmCur;
-          for (char a = 0; a < WHEEL_AVERAGE-1; a--){
+          for (char a = 0; a < WHEEL_AVERAGE-1; a++){
             arr[a] = arr[a+1];
             *rpm += (arr[a] / WHEEL_AVERAGE);
           }
