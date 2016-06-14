@@ -14,6 +14,7 @@ void CollectorAlgorithm::setup(RobotController* c) {
 
   this->setProcedure(Collector::SWEEPING);
   this->whichSide = BLACKSTUFF_LEFT;
+
 }
 
 void CollectorAlgorithm::loop(RobotController* c) {
@@ -172,22 +173,24 @@ void CollectorAlgorithm::loop(RobotController* c) {
       break;
 
     case Collector::GET_SAMPLE:
-      /*
-            while (c->GetUSDistanceAux() > 10.0) {
-              //Driving to sample
-              delay(5);
-            }
 
-            unsigned long startDriveTime = millis();
+      c->Forward(Speed::FULL);
 
-            c->Forward(Speed::QUARTER);
-            while (c->GetUSDistanceAux() > 6.0 && (millis() - startDriveTime) < 3000);
-            c->Forward(Speed::NONE);
+      while (c->GetUSDistanceAux() > 10.0) {
+        //Driving to sample
+        delay(5);
+      }
 
-            c->Grab(true); // IR sample detection
+      this->startDriveTime = millis();
 
-            this->setProcedure(Collector::RETURNING_LAB);
-      */
+      c->Forward(Speed::QUARTER);
+      while (c->GetUSDistanceAux() > 6.0 && (millis() - startDriveTime) < 3000) delay(5);
+
+      c->Forward(Speed::NONE);
+
+      c->Grab(true);
+
+      this->setProcedure(Collector::RETURNING_LAB);
 
       break;
 
