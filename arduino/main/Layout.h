@@ -19,9 +19,8 @@
 
 #include "ServoTimer2.h"
 
-#define WHEEL_RADIUS 2.75 // centimetres
-#define WHEEL_DISTANCE_APART 9 // Distance the wheels are apart in centimetres
-#define WHEEL_RPM_FULL 30
+#define WHEEL_RADIUS 3.3 // centimetres
+#define WHEEL_DISTANCE_APART 11 // Distance the wheels are apart in centimetres
 
 // Digital pins
 #define PIN_SERVO_GRABBER 10
@@ -44,7 +43,7 @@
 #define PIN_IR_RIGHT 1
 
 #define CALIBRATION_WHEEL_HOLES 8
-#define CALIBRATION_TIME_US_TURN 2000 // Time in microseconds it takes for the 'head' to make a full turn to left or right at full turning speed
+#define CALIBRATION_TIME_US_TURN 500 // Time in microseconds it takes for the 'head' to make a full turn to left or right at full turning speed
 
 typedef unsigned char pin;
 typedef ServoTimer2 Servo;
