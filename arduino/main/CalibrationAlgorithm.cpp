@@ -8,10 +8,6 @@ void CalibrationAlgorithm::setup(RobotController* c) {
 }
 
 void CalibrationAlgorithm::loop(RobotController* c) {
-  c->ToggleUSTurn(true);
-  c->Forward(Speed::QUARTER);
-  delay(3000);
-  c->Turn(-90);
-  while(c->IsPerforming(Action::TURNING)) continue;
+  this->returnToLab(c);
 }
 

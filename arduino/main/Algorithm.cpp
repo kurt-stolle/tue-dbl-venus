@@ -39,7 +39,7 @@ template <class Procedure> bool Algorithm<Procedure>::returnToLab(RobotControlle
 
   if (!labFound) return false;
 
-  c->Forward(Speed::HALF);
+  c->Forward(Speed::FULL);
 
   /*
    * Step 2: Adjust our angle as we go forward
@@ -47,12 +47,23 @@ template <class Procedure> bool Algorithm<Procedure>::returnToLab(RobotControlle
   bool nearLab = false;
    
   while (!nearLab){
+    c->ToggleUSTurn(false);
+  
+    while(c->GetIRLab() == Infrared::WHITE) continue;
+
+    c->Forward(Speed::NONE);
+
+    // Lab is lost! Look for it.
+
     c->ToggleUSTurn(true);
-  
+
     while(c->GetIRLab() != Infrared::WHITE) continue;
-  
+
+    // Found the lab!
+
     c->ToggleUSTurn(false); // This is the angle the lab is at now.
     c->Turn(c->GetUSAngle());
+    c->Forward(Speed::FULL);
     c->SetUSAngle(0);
   
     while(c->IsPerforming(Action::TURNING)) continue;
