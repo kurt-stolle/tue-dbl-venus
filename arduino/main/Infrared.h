@@ -25,7 +25,7 @@ class Infrared {
 
     enum Threshold {
       THRESH_WHITE = 150,
-      THRESH_GRAY = 300,  
+      THRESH_GRAY = 150,  
     };
 };
 
