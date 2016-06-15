@@ -14,7 +14,7 @@
 
 #define DISTANCE_INFINITE 10000
 
-#define WHEEL_AVERAGE 8 // # samples running averager
+#define WHEEL_AVERAGE 4 // # samples running averager
 
  // Enumerations for state
 namespace Action {

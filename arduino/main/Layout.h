@@ -19,8 +19,8 @@
 
 #include "ServoTimer2.h"
 
-#define WHEEL_RADIUS 3.3 // centimetres
-#define WHEEL_DISTANCE_APART 11 // Distance the wheels are apart in centimetres
+#define WHEEL_RADIUS 3.1 // centimetres
+#define WHEEL_DISTANCE_APART 10 // Distance the wheels are apart in centimetres
 
 // Digital pins
 #define PIN_SERVO_GRABBER 10

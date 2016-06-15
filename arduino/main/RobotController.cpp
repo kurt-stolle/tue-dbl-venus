@@ -214,9 +214,6 @@ inline void updateRPM(double* rpm, unsigned long* edge, uint8_t* last, double* a
         rpmCur = *rpm - 8.0;
       }
 
-      /* Add a calibration factor */
-      //rpmCur = rpmCur * 1.1;
-  
       /* Average */
       *rpm = 0.0;
       for (char a = 0; a < WHEEL_AVERAGE; a++) {
@@ -293,32 +290,26 @@ void RobotController::UpdateMovement() {
   // Apply a modulation to the wheel speed
   if (this->turnTarget > 2.0) {
     // Turn left
-
- //   if (this->turnTarget > 15.0) {
-      modLeft = 1;
-      modRight = -1;
-  /*  } else {
-      modLeft = 0.10;
-      modRight = -0.10;
-    }*/
     this->turnTarget -= (dx / (WHEEL_DISTANCE_APART / 2.0)) * (180.00 / PI);
 
-    if (this->turnTarget < 0){ // Cut off overshoot. Servo not accurate enough.
-      this->turnTarget = 0;
+    if (this->turnTarget < 0.0){ // Cut off overshoot. Servo not accurate enough.
+      this->turnTarget = 0.0;
+      modLeft = 1;
+      modRight = 1;
+    } else {
+      modLeft = 1;
+      modRight = -1;
     }
   } else if (this->turnTarget < -2.0) {
     // Turn right
-
- //   if (this->turnTarget < -15.0) {
+    this->turnTarget += (dx / (WHEEL_DISTANCE_APART / 2.0)) * (180.00 / PI);
+    if (this->turnTarget > 0.0){ 
+      this->turnTarget = 0.0;
+      modLeft = 1;
+      modRight = 1;
+    } else {
       modLeft = -1;
       modRight = 1;
-  /* } else {
-      modLeft = -0.10;
-      modRight = 0.10;
-    }*/
-    this->turnTarget += (dx / (WHEEL_DISTANCE_APART / 2.0)) * (180.00 / PI);
-    if (this->turnTarget > 0){ 
-      this->turnTarget = 0;
     }
   } else {
     this->distanceTraveled += dx;
