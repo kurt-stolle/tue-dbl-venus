@@ -79,11 +79,11 @@ template <class Procedure> bool Algorithm<Procedure>::avoid(RobotController* c) 
   double distance = 0.0;
   bool foundPassage = false;
 
-  c->Reverse(Speed::FULL);
-  delay(500);
-  c->Forward(Speed::FULL);
-
   while (count < 3 && !foundPassage) {
+    c->Reverse(Speed::FULL);
+    delay(500);
+    c->Forward(Speed::FULL);
+    
     c->Turn(left ? -90 : 90);
     while (c->IsPerforming(Action::TURNING_LEFT) || c->IsPerforming(Action::TURNING_RIGHT)) {
       if(c->GetIRLeft() == Infrared::BLACK || c->GetIRRight() == Infrared::BLACK) {

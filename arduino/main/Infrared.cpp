@@ -15,6 +15,7 @@ Infrared::Color Infrared::GetColor() {
 
   if(!longRange) {
     int measurement = analogRead(this->measurePin);
+    Serial.println(measurement);
   
     if (measurement < THRESH_GRAY) {
       return BLACK;
