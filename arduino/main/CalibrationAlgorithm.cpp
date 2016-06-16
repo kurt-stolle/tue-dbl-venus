@@ -8,7 +8,8 @@ void CalibrationAlgorithm::setup(RobotController* c) {
 }
 
 void CalibrationAlgorithm::loop(RobotController* c) {
-  c->Forward(Speed::FULL);
+  //returnToLab(c);
+  //c->ToggleUSTurn(true);
 
   while(true) {
       Serial.print("usMAIN: "); Serial.println(c->GetUSDistance());
@@ -16,7 +17,7 @@ void CalibrationAlgorithm::loop(RobotController* c) {
       Serial.print("irLEFT: "); Serial.println(c->GetIRLeft());
       Serial.print("irRIGHT: "); Serial.println(c->GetIRRight());
 
-      delay(100);
+      delay(300);
   }
 }
 

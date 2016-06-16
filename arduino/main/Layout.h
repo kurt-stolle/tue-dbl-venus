@@ -43,7 +43,7 @@
 #define PIN_IR_RIGHT 1
 
 #define CALIBRATION_WHEEL_HOLES 8
-#define CALIBRATION_TIME_US_TURN 500 // Time in microseconds it takes for the 'head' to make a full turn to left or right at full turning speed
+#define CALIBRATION_TIME_US_TURN 600 // Time in milliseconds it takes for the 'head' to make a 30 degree turn
 
 typedef unsigned char pin;
 typedef ServoTimer2 Servo;

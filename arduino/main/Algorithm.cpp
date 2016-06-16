@@ -62,7 +62,7 @@ template <class Procedure> bool Algorithm<Procedure>::returnToLab(RobotControlle
     // Found the lab!
 
     c->ToggleUSTurn(false); // This is the angle the lab is at now.
-    c->Turn(c->GetUSAngle());
+    c->Turn(-c->GetUSAngle());
     c->Forward(Speed::FULL);
     c->SetUSAngle(0);
   

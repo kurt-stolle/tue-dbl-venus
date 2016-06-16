@@ -259,14 +259,16 @@ void RobotController::UpdateMovement() {
   */
   if (!this->usTurnEnabled) {
     this->usSensorServo.write(degToMs(this->usAngle));
-  } else if (millis() - this->lastUSTurn > CALIBRATION_TIME_US_TURN) {
+  } else if ((millis() - this->lastUSTurn) > CALIBRATION_TIME_US_TURN) {
     double newPosition = msToDeg(this->usSensorServo.read()) + 30.0;
-    if (newPosition > 90.0 + 30.0) {
+    
+    if (newPosition > 90.0) {
       newPosition = -90.0;
-      this->lastUSTurn = millis() + (CALIBRATION_TIME_US_TURN * 5); // allow some extra time to turn back
+      this->lastUSTurn = millis(); // allow some extra time to turn back
     } else {
       this->lastUSTurn = millis();
     }
+    Serial.println(newPosition);
     this->usSensorServo.write(degToMs(newPosition));
   }
 
