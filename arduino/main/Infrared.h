@@ -1,7 +1,7 @@
 /*
-*  TU/e Venus OGO
-*  Infrared
-*  Library for simple infrared functions
+   TU/e Venus OGO
+   Infrared
+   Library for simple infrared functions
 */
 
 #ifndef Infrared_h
@@ -25,7 +25,7 @@ class Infrared {
 
     enum Threshold {
       THRESH_WHITE = 150,
-      THRESH_GRAY = 150,  
+      THRESH_GRAY = 150,
     };
 };
 

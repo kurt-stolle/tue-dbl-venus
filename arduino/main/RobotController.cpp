@@ -39,6 +39,7 @@ RobotController::RobotController() {
   this->irLab.Attach(PIN_IR_LAB, true);
   this->irSample.Attach(PIN_IR_SAMPLE, true);
   this->servoGrabber.attach(PIN_SERVO_GRABBER);
+  this->Grab(false);
 
   this->lastMovementUpdate = micros();
   this->distanceTraveled = 0.0;
@@ -144,7 +145,7 @@ void RobotController::USListenAux() {
 }
 
 double RobotController::GetUSAngle() {
-  return msToDeg(this->usSensorServo.read());
+  return -1 * msToDeg(this->usSensorServo.read());
 }
 
 void RobotController::SetUSAngle(double angle) {
@@ -207,10 +208,10 @@ inline void updateRPM(double* rpm, unsigned long* edge, uint8_t* last, double* a
       double rpmCur  = (double) (60000.0 / ((millis() - *edge) * ((double) CALIBRATION_WHEEL_HOLES)));
 
       /* Set bounds */
-      if (rpmCur > *rpm + 8.0){
+      if (rpmCur > *rpm + 8.0) {
         rpmCur = *rpm + 8.0;
       }
-      else if (rpmCur < *rpm - 8.0){
+      else if (rpmCur < *rpm - 8.0) {
         rpmCur = *rpm - 8.0;
       }
 
@@ -261,14 +262,14 @@ void RobotController::UpdateMovement() {
     this->usSensorServo.write(degToMs(this->usAngle));
   } else if ((millis() - this->lastUSTurn) > CALIBRATION_TIME_US_TURN) {
     double newPosition = msToDeg(this->usSensorServo.read()) + 30.0;
-    
+
     if (newPosition > 90.0) {
       newPosition = -90.0;
       this->lastUSTurn = millis(); // allow some extra time to turn back
     } else {
       this->lastUSTurn = millis();
     }
-    Serial.println(newPosition);
+
     this->usSensorServo.write(degToMs(newPosition));
   }
 
@@ -282,8 +283,6 @@ void RobotController::UpdateMovement() {
     speed = Speed::NONE;
   }
 
-
-
   // Calculate the delta for how far we have turned (and moved) since last time
   double dx = wheelDistanceDelta(dt, this->RPM);
   double modLeft;
@@ -294,7 +293,7 @@ void RobotController::UpdateMovement() {
     // Turn left
     this->turnTarget -= (dx / (WHEEL_DISTANCE_APART / 2.0)) * (180.00 / PI);
 
-    if (this->turnTarget < 0.0){ // Cut off overshoot. Servo not accurate enough.
+    if (this->turnTarget < 0.0) { // Cut off overshoot. Servo not accurate enough.
       this->turnTarget = 0.0;
       modLeft = 1;
       modRight = 1;
@@ -305,7 +304,7 @@ void RobotController::UpdateMovement() {
   } else if (this->turnTarget < -2.0) {
     // Turn right
     this->turnTarget += (dx / (WHEEL_DISTANCE_APART / 2.0)) * (180.00 / PI);
-    if (this->turnTarget > 0.0){ 
+    if (this->turnTarget > 0.0) {
       this->turnTarget = 0.0;
       modLeft = 1;
       modRight = 1;
