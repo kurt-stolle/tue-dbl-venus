@@ -16,8 +16,8 @@ void CalibrationAlgorithm::loop(RobotController* c) {
   while (true) {
     Serial.print("usMAIN: "); Serial.println(c->GetUSDistance());
     Serial.print("usAUX: "); Serial.println(c->GetUSDistanceAux());
-    Serial.print("irLEFT: "); Serial.println(c->GetIRLeft());
-    Serial.print("irRIGHT: "); Serial.println(c->GetIRRight());
+    Serial.print("irLEFT: "); Serial.println(analogRead(PIN_IR_LEFT));
+    Serial.print("irRIGHT: "); Serial.println(analogRead(PIN_IR_RIGHT));
 
     delay(300);
   }

@@ -14,7 +14,7 @@
   * 2 - ScoutAlgorithm
   * 3 - CollectorAlgorithm
   */
-#define ALGORITHM 1
+#define ALGORITHM 3
 
 
 #include "ServoTimer2.h"
@@ -43,7 +43,7 @@
 #define PIN_IR_RIGHT 1
 
 #define CALIBRATION_WHEEL_HOLES 8
-#define CALIBRATION_TIME_US_TURN 600 // Time in milliseconds it takes for the 'head' to make a 30 degree turn
+#define CALIBRATION_TIME_US_TURN 200 // Time in milliseconds it takes for the 'head' to make a 30 degree turn
 
 typedef unsigned char pin;
 typedef ServoTimer2 Servo;

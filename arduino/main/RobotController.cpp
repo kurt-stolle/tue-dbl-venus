@@ -263,8 +263,8 @@ void RobotController::UpdateMovement() {
   } else if ((millis() - this->lastUSTurn) > CALIBRATION_TIME_US_TURN) {
     double newPosition = msToDeg(this->usSensorServo.read()) + 30.0;
 
-    if (newPosition > 90.0) {
-      newPosition = -90.0;
+    if (newPosition > 60.0 - 30.0) {
+      newPosition = -60.0;
       this->lastUSTurn = millis(); // allow some extra time to turn back
     } else {
       this->lastUSTurn = millis();
